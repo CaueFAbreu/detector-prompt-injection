@@ -1,0 +1,33 @@
+# Ambiente virtual
+.venv/
+venv/
+env/
+
+# Dados e pesos (gerados localmente; ver README)
+data/
+artifacts/*
+!artifacts/.gitkeep
+
+# Segredos
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Ferramentas
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Editores e sistema operacional
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Documentos locais
+CLAUDE.md
