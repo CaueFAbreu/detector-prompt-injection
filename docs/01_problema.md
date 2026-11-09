@@ -1,6 +1,6 @@
 # Definição do problema: detector de prompt injection em português
 
-**Versão:** 0.2 (objetivo, escopo, definições, entrada e saída; limiar, protocolo e limitações em elaboração)  
+**Versão:** 0.3 (objetivo, escopo, definições, entrada e saída, política de decisão e métricas; protocolo e limitações em elaboração)  
 **Data:** 09/11/2026  
 **Status:** especificação escrita antes da coleta de dados e dos experimentos; nenhuma métrica foi medida.  
 
@@ -98,6 +98,58 @@ A NFKC não converte letras de outros alfabetos parecidas com letras latinas (po
 
 A família de ataque não faz parte da saída (D3). O score permite que a aplicação registre o grau de suspeita para auditoria sem registrar o conteúdo da mensagem.
 
+## 5. Política de decisão
+
+### 5.1 Restrições de falso positivo
+
+Cada mensagem sem ataque do dataset é anotada como **comum** ou **difícil** (negativo difícil, seção 3.1). O FPR é a fração de mensagens sem ataque classificadas como ataque, calculada separadamente em cada grupo.
+
+**Regra principal:** escolher o par modelo–limiar que maximize o recall de ataques na validação, sujeito a:
+
+| Restrição | Limite | Interpretação |
+|---|---|---|
+| FPR nos negativos comuns | ≤ 2% | Aproxima o tráfego real: com 1.000 mensagens legítimas por dia, cerca de 20 seriam bloqueadas. |
+| FPR nos negativos difíceis | ≤ 20% | Mede se o modelo distingue a intenção das palavras; um modelo de palavras-chave bloquearia a maior parte desses casos. |
+
+Os limites são escolhas de política, feitas antes dos experimentos, com viés de segurança: aceita-se bloquear mais mensagens legítimas para detectar mais ataques. Não são garantias de desempenho futuro.
+
+A restrição é sobre o FPR, e não sobre a precision, porque a precision depende da proporção de ataques no conjunto avaliado. Essa proporção é definida na construção do dataset e não representa o tráfego real. O FPR não depende dela. Pelo mesmo motivo, os negativos comuns e difíceis têm restrições separadas: a proporção de difíceis também é escolhida na construção do dataset.
+
+Não há piso de recall: um modelo elegível é aprovado com o recall que alcançar, e esse recall é reportado com seu intervalo de confiança. Um limiar com recall zero, porém, não aprova o modelo.
+
+### 5.2 Procedimento
+
+1. Os limiares candidatos de cada modelo são os scores distintos que ele produz na validação. Aplica-se sempre `score >= limiar`.
+2. Um limiar é elegível quando cumpre as duas restrições da seção 5.1 na validação.
+3. Para cada modelo, escolher o limiar elegível de maior recall. Em empate, preferir o menor FPR nos negativos comuns e, persistindo o empate, o maior limiar.
+4. Entre os modelos, vence o de maior recall na validação. Em empate, preferir a maior PR-AUC na validação e, depois, o modelo mais simples, na ordem heurística, TF-IDF com regressão logística e Transformer, por custo e latência.
+5. A heurística concorre nas mesmas condições dos demais modelos e pode vencer.
+6. Congelar modelo, normalização, limiar e versão antes de consultar o teste. O teste serve para relatar o resultado final, sem trocar o vencedor nem reajustar o limiar.
+
+**Se nenhum modelo for elegível:** registrar que nenhum foi aprovado e publicar as curvas e métricas obtidas, mantendo os limites da seção 5.1. Não afrouxar os limites em silêncio nem usar o teste para procurar uma solução. Uma nova rodada exige revisão registrada deste documento.
+
+## 6. Métricas
+
+| Métrica | Papel |
+|---|---|
+| Recall de ataques no limiar | Critério de seleção. |
+| FPR nos negativos comuns e nos difíceis | Restrições de elegibilidade. |
+| PR-AUC | Comparação entre modelos independente do limiar. Depende da proporção de ataques; só é comparável dentro do mesmo conjunto. |
+| Recall por família e por idioma | Análise de erros e generalização. |
+| FPR por idioma | Verificação do atalho de idioma (seção 3.3). |
+| Precision no limiar | Reportada com a ressalva de que depende da proporção de ataques do conjunto. |
+| Precision projetada | Ver a seção 6.1. |
+
+Todas as métricas que são proporções (recall, FPR e precision) são reportadas com **intervalo de confiança de 95% de Wilson**, acompanhadas das contagens de acertos e erros. O intervalo de Wilson se comporta bem com proporções próximas de 0 ou de 1, como um FPR de 2%. Com poucas amostras, como uma família com dezenas de exemplos, diferenças pequenas entre modelos podem ser apenas ruído. A PR-AUC não é uma proporção e é reportada sem intervalo nesta versão.
+
+### 6.1 Precision projetada
+
+A precision em produção depende da fração de ataques no tráfego real, π, que este projeto não mede:
+
+`precision = recall × π / (recall × π + FPR × (1 − π))`
+
+Para o modelo aprovado, será reportada uma tabela com a precision projetada para π de 10%, 1% e 0,1%, usando o recall e o FPR nos negativos comuns medidos no teste. A tabela é uma projeção, e não uma medição. Medir a precision real exigiria revisar uma amostra dos alertas em produção, o que está fora do escopo desta versão.
+
 ## Registro de decisões
 
 | ID | Decisão | Alternativa descartada | Motivo |
@@ -112,3 +164,9 @@ A família de ataque não faz parte da saída (D3). O score permite que a aplica
 | D8 | Texto analisado por inteiro até 4.096 caracteres, com janelas e score máximo; vazio ou acima do limite é inválido | Truncar no limite do modelo, ou rejeitar acima dele | Truncar abre uma evasão trivial; rejeitar bloquearia mensagens legítimas longas. |
 | D9 | Normalização mínima (NFKC, remoção de invisíveis, sem minúsculas), idêntica em todas as fases | Texto bruto | Neutraliza disfarces baratos e mantém as maiúsculas, que os modelos *cased* usam. |
 | D10 | Saída com score, classe, limiar e versão do modelo | Devolver só a classe | Permite auditoria e rastreabilidade sem registrar o conteúdo da mensagem. |
+| D11 | Restringir o FPR, e não a precision | Precision mínima, como no projeto de fraude; maximizar o F1 | A precision depende da proporção de ataques, que é artificial no dataset; o F1 não expressa custo. |
+| D12 | FPR ≤ 2% nos negativos comuns e ≤ 20% nos difíceis | Uma restrição no FPR geral; limites de 1% e 10% | A proporção de difíceis também é artificial; os limites mais altos dão preferência à segurança sem inviabilizar o uso. |
+| D13 | Sem piso de recall | Reprovar o detector abaixo de um recall mínimo | Sem dados, o piso seria arbitrário; a preferência por segurança já está nos limites de FPR. |
+| D14 | Procedimento da seção 5.2, com desempate pelo modelo mais simples | Escolher o modelo por julgamento após ver os resultados | Regra fixada antes dos dados evita ajustar a escolha ao resultado. |
+| D15 | Intervalo de Wilson de 95% em todas as proporções | Bootstrap | Adequado a proporções extremas e simples de calcular; o bootstrap exigiria mais código e tempo. |
+| D16 | Precision projetada para π de 10%, 1% e 0,1% | Revisão amostral ou modo sombra em produção | Exigiriam guardar o conteúdo das mensagens e um volume de tráfego que o projeto não tem. |
