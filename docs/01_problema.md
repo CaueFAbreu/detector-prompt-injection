@@ -1,6 +1,6 @@
 # Definição do problema: detector de prompt injection em português
 
-**Versão:** 0.1 (objetivo, escopo e definições; entrada, limiar, protocolo e limitações em elaboração)  
+**Versão:** 0.2 (objetivo, escopo, definições, entrada e saída; limiar, protocolo e limitações em elaboração)  
 **Data:** 09/11/2026  
 **Status:** especificação escrita antes da coleta de dados e dos experimentos; nenhuma métrica foi medida.  
 
@@ -63,6 +63,41 @@ Todo exemplo, com ou sem ataque, recebe um atributo de idioma: `pt`, `en` ou `mi
 
 Os ataques públicos estão majoritariamente em inglês, e as mensagens de atendimento estarão majoritariamente em português. Se o dataset reproduzir essa associação, o modelo pode aprender o idioma como atalho. Por isso, o dataset deverá conter mensagens sem ataque em inglês e mistas, e as métricas serão reportadas também por idioma.
 
+## 4. Entrada e saída
+
+### 4.1 Entrada
+
+A entrada é **uma única mensagem de usuário**, em texto, incluindo qualquer conteúdo que o próprio usuário tenha colado nela. O detector não recebe o histórico da conversa nem conteúdos inseridos pela aplicação, como respostas de ferramentas ou documentos recuperados.
+
+| Regra | Comportamento |
+|---|---|
+| Texto vazio ou formado só por espaços | Entrada inválida; nenhum score é produzido. |
+| Texto com até 4.096 caracteres, após a normalização | Analisado por inteiro. |
+| Texto com mais de 4.096 caracteres | Entrada inválida; cabe a quem integra o detector rejeitar ou dividir a mensagem. |
+
+O texto **nunca é truncado em silêncio**: um ataque escondido no fim de uma mensagem longa precisa ser analisado. Quando o texto exceder o limite de tokens de um modelo, ele será dividido em janelas, e o score final será o maior score entre as janelas. O tamanho e a sobreposição das janelas serão definidos no fine-tuning. O limite de 4.096 caracteres poderá ser revisto após a medição de latência, com registro neste documento.
+
+### 4.2 Normalização
+
+O mesmo procedimento de normalização é aplicado no treino, na avaliação e na inferência:
+
+- normalização Unicode NFKC, que unifica formas de compatibilidade, como letras de largura total e ligaduras;
+- remoção de caracteres invisíveis, como o espaço de largura zero;
+- preservação de maiúsculas e minúsculas.
+
+A NFKC não converte letras de outros alfabetos parecidas com letras latinas (por exemplo, o "і" cirílico). Se esses homóglifos serão mapeados é uma decisão da construção do dataset, que também definirá a lista exata de caracteres invisíveis e os testes da normalização.
+
+### 4.3 Saída
+
+| Campo | Tipo | Significado |
+|---|---|---|
+| `score` | Número entre 0 e 1 | Score da classe ataque. Ordena as mensagens por suspeita, mas não é uma probabilidade calibrada. |
+| `classe` | `ataque` ou `sem_ataque` | `ataque` quando `score >= limiar`; caso contrário, `sem_ataque`. |
+| `limiar` | Número entre 0 e 1 | Limiar escolhido pela política da seção 5 e salvo com o modelo. Não pode ser alterado por quem envia a mensagem. |
+| `versao_modelo` | Texto não vazio | Identifica o conjunto de modelo, normalização e limiar que produziu a resposta. |
+
+A família de ataque não faz parte da saída (D3). O score permite que a aplicação registre o grau de suspeita para auditoria sem registrar o conteúdo da mensagem.
+
 ## Registro de decisões
 
 | ID | Decisão | Alternativa descartada | Motivo |
@@ -73,3 +108,7 @@ Os ataques públicos estão majoritariamente em inglês, e as mensagens de atend
 | D4 | Uma família por ataque, com regra de precedência | Dois eixos (objetivo e técnica) | Mantém o teste por família limpo e a anotação determinística. |
 | D5 | Pedir o prompt do sistema é ataque (`vazamento`) | Exigir uma técnica de manipulação | É o primeiro passo de muitos ataques; sem isso a família ficaria quase vazia. |
 | D6 | Inglês e mensagens mistas no escopo; idioma como atributo separado | Somente português, ou idioma como forma de ofuscação | Ataques reais chegam em inglês; tratar o idioma como família esconderia o atalho de idioma e desfiguraria o teste por família. |
+| D7 | A entrada é só a mensagem atual, com o conteúdo colado pelo usuário | Incluir o histórico ou o conteúdo inserido pela aplicação | Guardrail sem estado e dataset de uma linha por mensagem; quase não há dados públicos de ataques em várias mensagens. |
+| D8 | Texto analisado por inteiro até 4.096 caracteres, com janelas e score máximo; vazio ou acima do limite é inválido | Truncar no limite do modelo, ou rejeitar acima dele | Truncar abre uma evasão trivial; rejeitar bloquearia mensagens legítimas longas. |
+| D9 | Normalização mínima (NFKC, remoção de invisíveis, sem minúsculas), idêntica em todas as fases | Texto bruto | Neutraliza disfarces baratos e mantém as maiúsculas, que os modelos *cased* usam. |
+| D10 | Saída com score, classe, limiar e versão do modelo | Devolver só a classe | Permite auditoria e rastreabilidade sem registrar o conteúdo da mensagem. |
