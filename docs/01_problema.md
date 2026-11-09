@@ -1,6 +1,6 @@
 # Definição do problema: detector de prompt injection em português
 
-**Versão:** 0.3 (objetivo, escopo, definições, entrada e saída, política de decisão e métricas; protocolo e limitações em elaboração)  
+**Versão:** 0.4 (objetivo, escopo, definições, entrada e saída, política de decisão, métricas e protocolo; limitações em elaboração)  
 **Data:** 09/11/2026  
 **Status:** especificação escrita antes da coleta de dados e dos experimentos; nenhuma métrica foi medida.  
 
@@ -117,16 +117,24 @@ A restrição é sobre o FPR, e não sobre a precision, porque a precision depen
 
 Não há piso de recall: um modelo elegível é aprovado com o recall que alcançar, e esse recall é reportado com seu intervalo de confiança. Um limiar com recall zero, porém, não aprova o modelo.
 
-### 5.2 Procedimento
+### 5.2 Restrição de latência
+
+O detector roda antes do LLM em toda mensagem e, pela política de falha segura da integração, uma mensagem cuja análise exceda o tempo limite é recusada. Um detector lento atrasaria todas as respostas e bloquearia usuários legítimos por lentidão.
+
+**Regra:** um modelo só é elegível se o **p95 da sua latência for menor ou igual à mediana da latência de resposta do LLM do chatbot**. Em outras palavras, o guardrail pode, no máximo, dobrar o tempo de resposta típico.
+
+A latência do LLM é medida antes de qualquer medição dos detectores, e as duas são medidas na mesma máquina (seção 7.6). A restrição é avaliada por modelo, e não por limiar, porque o limiar não altera o tempo de inferência.
+
+### 5.3 Procedimento
 
 1. Os limiares candidatos de cada modelo são os scores distintos que ele produz na validação. Aplica-se sempre `score >= limiar`.
 2. Um limiar é elegível quando cumpre as duas restrições da seção 5.1 na validação.
 3. Para cada modelo, escolher o limiar elegível de maior recall. Em empate, preferir o menor FPR nos negativos comuns e, persistindo o empate, o maior limiar.
-4. Entre os modelos, vence o de maior recall na validação. Em empate, preferir a maior PR-AUC na validação e, depois, o modelo mais simples, na ordem heurística, TF-IDF com regressão logística e Transformer, por custo e latência.
+4. Entre os modelos que cumprem a restrição de latência da seção 5.2, vence o de maior recall na validação. Em empate, preferir a maior PR-AUC na validação e, depois, o modelo mais simples, na ordem heurística, TF-IDF com regressão logística e Transformer, por custo e latência.
 5. A heurística concorre nas mesmas condições dos demais modelos e pode vencer.
 6. Congelar modelo, normalização, limiar e versão antes de consultar o teste. O teste serve para relatar o resultado final, sem trocar o vencedor nem reajustar o limiar.
 
-**Se nenhum modelo for elegível:** registrar que nenhum foi aprovado e publicar as curvas e métricas obtidas, mantendo os limites da seção 5.1. Não afrouxar os limites em silêncio nem usar o teste para procurar uma solução. Uma nova rodada exige revisão registrada deste documento.
+**Se nenhum modelo for elegível:** registrar que nenhum foi aprovado e publicar as curvas e métricas obtidas, mantendo os limites das seções 5.1 e 5.2. Não afrouxar os limites em silêncio nem usar o teste para procurar uma solução. Uma nova rodada exige revisão registrada deste documento.
 
 ## 6. Métricas
 
@@ -150,6 +158,65 @@ A precision em produção depende da fração de ataques no tráfego real, π, q
 
 Para o modelo aprovado, será reportada uma tabela com a precision projetada para π de 10%, 1% e 0,1%, usando o recall e o FPR nos negativos comuns medidos no teste. A tabela é uma projeção, e não uma medição. Medir a precision real exigiria revisar uma amostra dos alertas em produção, o que está fora do escopo desta versão.
 
+## 7. Protocolo de avaliação
+
+### 7.1 Partições
+
+Cada exemplo pertence a um **grupo**: a mensagem de origem e todas as suas traduções, paráfrases e variações. Um mesmo modelo de mensagem legítima com suas variações também forma um grupo. O identificador de grupo é atribuído na construção do dataset.
+
+Os grupos são divididos em treino (60%), validação (20%) e teste (20%), com semente fixa `42`, buscando preservar em cada partição a proporção de classes, famílias e idiomas. **Nenhum grupo aparece em mais de uma partição.** Registrar os identificadores e as contagens por classe, família, idioma e tipo de negativo em cada partição.
+
+### 7.2 Tamanho mínimo
+
+Validação e teste devem ter, **cada um**, pelo menos:
+
+| Grupo de exemplos | Mínimo | Intervalo de Wilson de 95% esperado |
+|---|---:|---|
+| Negativos comuns | 1.000 | Para um FPR medido de 2%: de 1,3% a 3,1%. |
+| Negativos difíceis | 200 | Para um FPR medido de 20%: de 15,0% a 26,1%. |
+| Ataques de cada família | 50 | Para um recall medido de 80%: de 67,0% a 88,8%. |
+
+Esses mínimos implicam um dataset da ordem de 7.000 exemplos. Se algum grupo não atingir o mínimo, suas métricas são reportadas com o intervalo obtido e marcadas como indicativas, e a falta é registrada no documento de dados.
+
+### 7.3 Uso dos dados em cada fase
+
+| Fase | Dados permitidos |
+|---|---|
+| Escrita das regras da heurística | Somente o treino. |
+| Escolha de hiperparâmetros do TF-IDF com regressão logística | Validação cruzada por grupo, com 3 folds, dentro do treino. |
+| Escolha de hiperparâmetros e parada antecipada do Transformer | Um holdout interno por grupo, retirado do treino. |
+| Escolha do limiar e do modelo vencedor | Validação. |
+| Resultado final e teste de generalização por família | Teste, uma única vez, após o congelamento (seção 5.3). |
+
+A validação não é usada para a parada antecipada nem para a escolha de hiperparâmetros, para que o limiar não seja escolhido nos mesmos dados usados para ajustar o modelo.
+
+### 7.4 Orçamento de experimentos
+
+| Componente | Orçamento |
+|---|---|
+| Heurística | Uma versão. |
+| TF-IDF com regressão logística | Até 12 configurações. |
+| Transformer | Até 6 fine-tunings no total, incluindo a escolha do modelo base. |
+| Teste de generalização por família | 5 retreinos do TF-IDF e 5 do Transformer, um por família, com a melhor configuração de cada tipo de modelo e sem nova busca. |
+
+As configurações são congeladas antes de cada busca e registradas com sementes, parâmetros, duração e métricas. Ampliar o orçamento exige revisão registrada deste documento.
+
+### 7.5 Teste de generalização por família
+
+Para cada família *f*:
+
+1. treinar o modelo sem nenhum exemplo de *f*;
+2. escolher o limiar pela política da seção 5, na validação sem os ataques de *f*;
+3. medir, no teste, o recall nos ataques de *f* e o FPR nos negativos comuns e difíceis.
+
+A avaliação ocorre junto com a avaliação final, após o congelamento. A heurística não participa, porque não é treinada.
+
+### 7.6 Medição de latência
+
+- **LLM do chatbot:** mediana do tempo de resposta do serviço de LLM do chatbot para pelo menos 100 mensagens sem ataque da validação, medida na máquina em que o chatbot roda. Só mensagens sem ataque são enviadas ao provedor do LLM.
+- **Detectores:** p50 e p95 do tempo de normalização e inferência, uma mensagem por vez, após um aquecimento, em uma amostra aleatória de 1.000 mensagens da validação, na mesma máquina. Também são reportados p50 e p95 para mensagens de 4.096 caracteres.
+- Registrar CPU, memória, sistema operacional, número de threads e versões das bibliotecas.
+
 ## Registro de decisões
 
 | ID | Decisão | Alternativa descartada | Motivo |
@@ -167,6 +234,12 @@ Para o modelo aprovado, será reportada uma tabela com a precision projetada par
 | D11 | Restringir o FPR, e não a precision | Precision mínima, como no projeto de fraude; maximizar o F1 | A precision depende da proporção de ataques, que é artificial no dataset; o F1 não expressa custo. |
 | D12 | FPR ≤ 2% nos negativos comuns e ≤ 20% nos difíceis | Uma restrição no FPR geral; limites de 1% e 10% | A proporção de difíceis também é artificial; os limites mais altos dão preferência à segurança sem inviabilizar o uso. |
 | D13 | Sem piso de recall | Reprovar o detector abaixo de um recall mínimo | Sem dados, o piso seria arbitrário; a preferência por segurança já está nos limites de FPR. |
-| D14 | Procedimento da seção 5.2, com desempate pelo modelo mais simples | Escolher o modelo por julgamento após ver os resultados | Regra fixada antes dos dados evita ajustar a escolha ao resultado. |
+| D14 | Procedimento da seção 5.3, com desempate pelo modelo mais simples | Escolher o modelo por julgamento após ver os resultados | Regra fixada antes dos dados evita ajustar a escolha ao resultado. |
 | D15 | Intervalo de Wilson de 95% em todas as proporções | Bootstrap | Adequado a proporções extremas e simples de calcular; o bootstrap exigiria mais código e tempo. |
 | D16 | Precision projetada para π de 10%, 1% e 0,1% | Revisão amostral ou modo sombra em produção | Exigiriam guardar o conteúdo das mensagens e um volume de tráfego que o projeto não tem. |
+| D17 | Partições 60/20/20 por grupo, com semente 42 | Divisão aleatória por linha; 80/10/10 | A divisão por linha vaza traduções e paráfrases entre partições; validação e teste maiores são necessários para estimar um FPR de 2%. |
+| D18 | Mínimos de 1.000 negativos comuns, 200 difíceis e 50 ataques por família na validação e no teste | Sem tamanho mínimo | Abaixo disso, os intervalos de confiança ficam largos demais para avaliar as restrições. |
+| D19 | Heurística e hiperparâmetros ajustados só com o treino; validação reservada ao limiar e à escolha do modelo | Usar a validação para a parada antecipada | Ajustar modelo e limiar nos mesmos dados deixa o resultado otimista. |
+| D20 | Orçamento fixo: 1 heurística, até 12 configurações de TF-IDF e até 6 fine-tunings | Busca livre | Um teto definido antes impede repetir experimentos até obter um bom resultado. |
+| D21 | Teste de generalização por família avaliado no teste, junto da avaliação final | Avaliar na validação, ou em todos os exemplos da família | Mantém o resultado final inteiramente no teste, consultado uma única vez. |
+| D22 | Elegível só se o p95 da latência do detector for ≤ a mediana da latência do LLM do chatbot | Só reportar a latência; limite fixo em milissegundos | Garante que o guardrail possa ser usado sem um limite arbitrário; com a falha segura, um detector lento bloquearia usuários legítimos. |
