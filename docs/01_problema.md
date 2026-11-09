@@ -1,6 +1,6 @@
 # Definição do problema: detector de prompt injection em português
 
-**Versão:** 1.0  
+**Versão:** 1.1 (entrada vazia após a normalização, violação de restrição no teste e tamanho mínimo do dataset)  
 **Data:** 09/11/2026  
 **Status:** especificação escrita antes da coleta de dados e dos experimentos; nenhuma métrica foi medida.  
 
@@ -83,7 +83,7 @@ A entrada é **uma única mensagem de usuário**, em texto, incluindo qualquer c
 
 | Regra | Comportamento |
 |---|---|
-| Texto vazio ou formado só por espaços | Entrada inválida; nenhum score é produzido. |
+| Texto vazio ou formado só por espaços após a normalização (seção 4.2) | Entrada inválida; nenhum score é produzido. Inclui mensagens formadas só por caracteres invisíveis. |
 | Texto com até 4.096 caracteres, após a normalização | Analisado por inteiro. |
 | Texto com mais de 4.096 caracteres | Entrada inválida; cabe a quem integra o detector rejeitar ou dividir a mensagem. |
 
@@ -148,6 +148,8 @@ A latência do LLM é medida antes de qualquer medição dos detectores, e as du
 
 **Se nenhum modelo for elegível:** registrar que nenhum foi aprovado e publicar as curvas e métricas obtidas, mantendo os limites das seções 5.1 e 5.2. Não afrouxar os limites em silêncio nem usar o teste para procurar uma solução. Uma nova rodada exige revisão registrada deste documento.
 
+**Se o modelo aprovado violar uma restrição no teste:** os limites são cumpridos na validação, e o FPR do teste pode ultrapassá-los por variação amostral. Nesse caso, reportar a violação com o intervalo de confiança como falha de generalização da meta, sem reajustar o limiar nem trocar o modelo.
+
 ## 6. Métricas
 
 | Métrica | Papel |
@@ -189,7 +191,7 @@ Validação e teste devem ter, **cada um**, pelo menos:
 | Negativos difíceis | 200 | Para um FPR medido de 20%: de 15,0% a 26,1%. |
 | Ataques de cada família | 50 | Para um recall medido de 80%: de 67,0% a 88,8%. |
 
-Esses mínimos implicam um dataset da ordem de 7.000 exemplos. Se algum grupo não atingir o mínimo, suas métricas são reportadas com o intervalo obtido e marcadas como indicativas, e a falta é registrada no documento de dados.
+Esses mínimos somam 1.450 exemplos por partição e implicam um dataset de, no mínimo, cerca de 7.250 exemplos (1.450 divididos por 20%). Como a divisão é feita por grupo, o total necessário tende a ser maior. Se algum grupo não atingir o mínimo, suas métricas são reportadas com o intervalo obtido e marcadas como indicativas, e a falta é registrada no documento de dados.
 
 ### 7.3 Uso dos dados em cada fase
 
@@ -290,3 +292,5 @@ As limitações abaixo devem acompanhar qualquer apresentação dos resultados.
 | D22 | Elegível só se o p95 da latência do detector for ≤ a mediana da latência do LLM do chatbot | Só reportar a latência; limite fixo em milissegundos | Garante que o guardrail possa ser usado sem um limite arbitrário; com a falha segura, um detector lento bloquearia usuários legítimos. |
 | D23 | Origem anotada (`original`, `traduzido` ou `escrito`) e métricas por origem | Apenas registrar o risco como limitação | Ataques traduzidos e negativos escritos em português criariam um atalho de tradução que inflaria os resultados sem ser percebido. |
 | D24 | Publicar os pesos e documentar o risco de ataques adaptativos | Publicar apenas a demonstração | Transparência e reprodutibilidade; esconder os pesos só atrasaria um atacante que pode consultar a demonstração. |
+| D25 | A entrada vazia é verificada após a normalização | Verificar antes da normalização | Uma mensagem formada só por caracteres invisíveis ficaria ambígua e poderia ser usada para testar o detector. |
+| D26 | Violação de restrição no teste é reportada como falha de generalização, sem reajuste | Reajustar o limiar no teste | Reajustar no teste o transformaria em validação e invalidaria o resultado final. |
