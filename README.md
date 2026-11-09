@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/CaueFAbreu/detector-prompt-injection/actions/workflows/ci.yml/badge.svg)](https://github.com/CaueFAbreu/detector-prompt-injection/actions/workflows/ci.yml)
 
-Detector de prompt injection e jailbreak para mensagens em português, pensado como guardrail de chatbots: recebe a mensagem de um usuário antes de ela chegar ao LLM e indica se é um ataque ou uma mensagem legítima.
+Detector de prompt injection e jailbreak para mensagens em português, pensado como guardrail de chatbots: recebe a mensagem de um usuário antes de ela chegar ao LLM e indica se ela é uma tentativa de ataque.
 
 > **Status:** em desenvolvimento. Concluídas a estrutura do repositório e a [definição do problema](docs/01_problema.md), com a política de decisão e o protocolo de avaliação fixados antes da coleta de dados. Próximas etapas: construção do dataset, modelos de referência, fine-tuning de um Transformer, publicação no Hugging Face e integração como guardrail.
 
