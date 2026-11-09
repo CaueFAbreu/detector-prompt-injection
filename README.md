@@ -4,7 +4,7 @@
 
 Detector de prompt injection e jailbreak para mensagens em português, pensado como guardrail de chatbots: recebe a mensagem de um usuário antes de ela chegar ao LLM e indica se é um ataque ou uma mensagem legítima.
 
-> **Status:** em desenvolvimento. Concluída a estrutura do repositório, com ambiente, testes e integração contínua. Próximas etapas: especificação do problema, construção do dataset, modelos de referência, fine-tuning de um Transformer, publicação no Hugging Face e integração como guardrail.
+> **Status:** em desenvolvimento. Concluídas a estrutura do repositório e a [definição do problema](docs/01_problema.md), com a política de decisão e o protocolo de avaliação fixados antes da coleta de dados. Próximas etapas: construção do dataset, modelos de referência, fine-tuning de um Transformer, publicação no Hugging Face e integração como guardrail.
 
 ## Stack
 

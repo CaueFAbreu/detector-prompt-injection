@@ -1,6 +1,6 @@
 # Definição do problema: detector de prompt injection em português
 
-**Versão:** 0.4 (objetivo, escopo, definições, entrada e saída, política de decisão, métricas e protocolo; limitações em elaboração)  
+**Versão:** 1.0  
 **Data:** 09/11/2026  
 **Status:** especificação escrita antes da coleta de dados e dos experimentos; nenhuma métrica foi medida.  
 
@@ -62,6 +62,18 @@ Quando um ataque se encaixa em mais de uma família, vale a **precedência** `in
 Todo exemplo, com ou sem ataque, recebe um atributo de idioma: `pt`, `en` ou `misto`. O idioma não é uma família: uma mensagem em inglês não é um ataque por estar em inglês.
 
 Os ataques públicos estão majoritariamente em inglês, e as mensagens de atendimento estarão majoritariamente em português. Se o dataset reproduzir essa associação, o modelo pode aprender o idioma como atalho. Por isso, o dataset deverá conter mensagens sem ataque em inglês e mistas, e as métricas serão reportadas também por idioma.
+
+### 3.4 Origem
+
+Todo exemplo também recebe um atributo de origem:
+
+| Origem | Significado |
+|---|---|
+| `original` | Texto de uma fonte pública, no idioma em que foi publicado. |
+| `traduzido` | Texto traduzido por um LLM a partir de uma fonte pública. |
+| `escrito` | Texto escrito diretamente para este projeto. |
+
+O risco é análogo ao do idioma: se os ataques forem majoritariamente traduzidos e as mensagens sem ataque majoritariamente escritas em português, o modelo pode aprender as marcas de tradução como sinal de ataque. Por isso, o dataset deverá ter traduções também entre as mensagens sem ataque e ataques escritos diretamente em português, e as métricas serão reportadas por origem. Novas origens, como paráfrases geradas por LLM, podem ser acrescentadas na construção do dataset, com registro.
 
 ## 4. Entrada e saída
 
@@ -145,6 +157,7 @@ A latência do LLM é medida antes de qualquer medição dos detectores, e as du
 | PR-AUC | Comparação entre modelos independente do limiar. Depende da proporção de ataques; só é comparável dentro do mesmo conjunto. |
 | Recall por família e por idioma | Análise de erros e generalização. |
 | FPR por idioma | Verificação do atalho de idioma (seção 3.3). |
+| Recall e FPR por origem | Verificação do atalho de tradução (seção 3.4). |
 | Precision no limiar | Reportada com a ressalva de que depende da proporção de ataques do conjunto. |
 | Precision projetada | Ver a seção 6.1. |
 
@@ -164,7 +177,7 @@ Para o modelo aprovado, será reportada uma tabela com a precision projetada par
 
 Cada exemplo pertence a um **grupo**: a mensagem de origem e todas as suas traduções, paráfrases e variações. Um mesmo modelo de mensagem legítima com suas variações também forma um grupo. O identificador de grupo é atribuído na construção do dataset.
 
-Os grupos são divididos em treino (60%), validação (20%) e teste (20%), com semente fixa `42`, buscando preservar em cada partição a proporção de classes, famílias e idiomas. **Nenhum grupo aparece em mais de uma partição.** Registrar os identificadores e as contagens por classe, família, idioma e tipo de negativo em cada partição.
+Os grupos são divididos em treino (60%), validação (20%) e teste (20%), com semente fixa `42`, buscando preservar em cada partição a proporção de classes, famílias, idiomas e origens. **Nenhum grupo aparece em mais de uma partição.** Registrar os identificadores e as contagens por classe, família, idioma, origem e tipo de negativo em cada partição.
 
 ### 7.2 Tamanho mínimo
 
@@ -217,6 +230,38 @@ A avaliação ocorre junto com a avaliação final, após o congelamento. A heur
 - **Detectores:** p50 e p95 do tempo de normalização e inferência, uma mensagem por vez, após um aquecimento, em uma amostra aleatória de 1.000 mensagens da validação, na mesma máquina. Também são reportados p50 e p95 para mensagens de 4.096 caracteres.
 - Registrar CPU, memória, sistema operacional, número de threads e versões das bibliotecas.
 
+## 8. Limitações
+
+As limitações abaixo devem acompanhar qualquer apresentação dos resultados.
+
+**Sobre o que o detector analisa:**
+
+- Analisa uma mensagem por vez; ataques divididos em várias mensagens não são detectados (D7).
+- Não é avaliado em conteúdo inserido pela aplicação, como respostas de ferramentas e documentos recuperados (D7).
+- Não faz moderação de conteúdo nem verifica a resposta do LLM (seção 2).
+- Homóglifos de outros alfabetos só são tratados se a construção do dataset decidir mapeá-los (seção 4.2).
+
+**Sobre os números:**
+
+- O dataset é construído para este projeto, com proporções de ataques, negativos difíceis, idiomas e origens escolhidas na construção. Resultados nele não garantem o mesmo desempenho no tráfego real nem em outros domínios além do atendimento.
+- O score não é uma probabilidade calibrada (seção 4.3).
+- A precision em produção é projetada, não medida (seção 6.1).
+- O teste de generalização cobre as cinco famílias definidas; ele não garante a detecção de técnicas que surgirem depois.
+- A latência vale para a máquina em que foi medida (seção 7.6).
+- Grupos abaixo dos tamanhos mínimos têm resultados apenas indicativos (seção 7.2).
+
+**Sobre o adversário:**
+
+- Atacantes se adaptam. Um detector público pode ser estudado: com acesso aos pesos, é possível testar ataques offline e otimizar textos até que passem sem alerta. Os pesos serão publicados mesmo assim, por transparência e reprodutibilidade, e porque o mesmo pode ser feito, mais devagar, consultando uma demonstração.
+- O detector é **uma camada de defesa**. Ele não substitui o privilégio mínimo da aplicação (o LLM não deve ter permissão para executar ações sensíveis), a validação das ações nem o monitoramento.
+
+## 9. Uso responsável
+
+- Um alerta indica que a mensagem ultrapassou o limiar, e não que o usuário tenha má intenção. O detector não deve ser usado para punir, banir ou traçar perfil de pessoas.
+- Os eventos devem ser registrados sem o conteúdo da mensagem, com o score, a classe, o limiar e a versão do modelo.
+- A classe "sem ataque" não significa que a mensagem seja segura ou adequada (seção 3.1).
+- O detector não deve ser a única defesa de uma aplicação com LLM.
+
 ## Registro de decisões
 
 | ID | Decisão | Alternativa descartada | Motivo |
@@ -243,3 +288,5 @@ A avaliação ocorre junto com a avaliação final, após o congelamento. A heur
 | D20 | Orçamento fixo: 1 heurística, até 12 configurações de TF-IDF e até 6 fine-tunings | Busca livre | Um teto definido antes impede repetir experimentos até obter um bom resultado. |
 | D21 | Teste de generalização por família avaliado no teste, junto da avaliação final | Avaliar na validação, ou em todos os exemplos da família | Mantém o resultado final inteiramente no teste, consultado uma única vez. |
 | D22 | Elegível só se o p95 da latência do detector for ≤ a mediana da latência do LLM do chatbot | Só reportar a latência; limite fixo em milissegundos | Garante que o guardrail possa ser usado sem um limite arbitrário; com a falha segura, um detector lento bloquearia usuários legítimos. |
+| D23 | Origem anotada (`original`, `traduzido` ou `escrito`) e métricas por origem | Apenas registrar o risco como limitação | Ataques traduzidos e negativos escritos em português criariam um atalho de tradução que inflaria os resultados sem ser percebido. |
+| D24 | Publicar os pesos e documentar o risco de ataques adaptativos | Publicar apenas a demonstração | Transparência e reprodutibilidade; esconder os pesos só atrasaria um atacante que pode consultar a demonstração. |
