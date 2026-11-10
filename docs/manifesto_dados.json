@@ -1,0 +1,485 @@
+[
+  {
+    "fonte": "ai-safety-brazil/prompt-injection-br-synthetic",
+    "revisao": "73e244d89b5171f2372199a546617a49ac0f381a",
+    "arquivo": "LICENSE",
+    "tamanho": 277,
+    "sha256": "f6567b070d9186669fd331e6c50dbc3e53649e1150c6cab100407c148835eda6"
+  },
+  {
+    "fonte": "ai-safety-brazil/prompt-injection-br-synthetic",
+    "revisao": "73e244d89b5171f2372199a546617a49ac0f381a",
+    "arquivo": "README.md",
+    "tamanho": 8173,
+    "sha256": "db580638d6ac76877c9405fbce7409116b38627ed6be88a5fa87dd10736982e7"
+  },
+  {
+    "fonte": "ai-safety-brazil/prompt-injection-br-synthetic",
+    "revisao": "73e244d89b5171f2372199a546617a49ac0f381a",
+    "arquivo": "TERMS.md",
+    "tamanho": 761,
+    "sha256": "4ff9d494f6e1e615234a0d8df7d41dfa75eeb24785fa530714577109f93bf290"
+  },
+  {
+    "fonte": "ai-safety-brazil/prompt-injection-br-synthetic",
+    "revisao": "73e244d89b5171f2372199a546617a49ac0f381a",
+    "arquivo": "audit.json",
+    "tamanho": 5392,
+    "sha256": "5b1e39ecf0abfab15edab6cde77a10e7f5872e5e1ad60c19673d2bd6ae1df8df"
+  },
+  {
+    "fonte": "ai-safety-brazil/prompt-injection-br-synthetic",
+    "revisao": "73e244d89b5171f2372199a546617a49ac0f381a",
+    "arquivo": "data/test.parquet",
+    "tamanho": 382894,
+    "sha256": "cf3c8d4e2a3f562d4488cf3f0412bfbaf265caff4cc611ec76886843790acac1"
+  },
+  {
+    "fonte": "ai-safety-brazil/prompt-injection-br-synthetic",
+    "revisao": "73e244d89b5171f2372199a546617a49ac0f381a",
+    "arquivo": "data/train.parquet",
+    "tamanho": 3206158,
+    "sha256": "15c8244ff0a2bc742f636bed28386626ca24eae06da86a6e8aac1943f6dc8a37"
+  },
+  {
+    "fonte": "ai-safety-brazil/prompt-injection-br-synthetic",
+    "revisao": "73e244d89b5171f2372199a546617a49ac0f381a",
+    "arquivo": "data/validation.parquet",
+    "tamanho": 385345,
+    "sha256": "e77cb93cc4c3f850e4c5cea385028d937298c50209474f6c8dd1887636296edb"
+  },
+  {
+    "fonte": "ai-safety-brazil/prompt-injection-br-synthetic",
+    "revisao": "73e244d89b5171f2372199a546617a49ac0f381a",
+    "arquivo": "generation/families.json",
+    "tamanho": 409,
+    "sha256": "309b6993f8ff314af1f42812f55f4a125e49bf1d2dec47a4a21fea1cab7fd376"
+  },
+  {
+    "fonte": "ai-safety-brazil/prompt-injection-br-synthetic",
+    "revisao": "73e244d89b5171f2372199a546617a49ac0f381a",
+    "arquivo": "generation/protocol.json",
+    "tamanho": 2357,
+    "sha256": "65b6a5233a57ee03535e15a754d3a7df27a68e6e0af72b2daf56695c66de6a2c"
+  },
+  {
+    "fonte": "ai-safety-brazil/prompt-injection-br-synthetic",
+    "revisao": "73e244d89b5171f2372199a546617a49ac0f381a",
+    "arquivo": "manifest.json",
+    "tamanho": 4168,
+    "sha256": "5ab5b81153d8050b44a741a26e3c037ecbf29d313d6cbd152dbff7d5cdc44891"
+  },
+  {
+    "fonte": "ai-safety-brazil/jailbreak-br-synthetic",
+    "revisao": "1d74570f971dcc4f3c00ea90fc4600546b8bdd64",
+    "arquivo": "LICENSE",
+    "tamanho": 277,
+    "sha256": "f6567b070d9186669fd331e6c50dbc3e53649e1150c6cab100407c148835eda6"
+  },
+  {
+    "fonte": "ai-safety-brazil/jailbreak-br-synthetic",
+    "revisao": "1d74570f971dcc4f3c00ea90fc4600546b8bdd64",
+    "arquivo": "README.md",
+    "tamanho": 8113,
+    "sha256": "ccc43656de61f6d8c09c40c795a6d0dfed0d69d41061322b79090cd0331ce6ac"
+  },
+  {
+    "fonte": "ai-safety-brazil/jailbreak-br-synthetic",
+    "revisao": "1d74570f971dcc4f3c00ea90fc4600546b8bdd64",
+    "arquivo": "TERMS.md",
+    "tamanho": 761,
+    "sha256": "4ff9d494f6e1e615234a0d8df7d41dfa75eeb24785fa530714577109f93bf290"
+  },
+  {
+    "fonte": "ai-safety-brazil/jailbreak-br-synthetic",
+    "revisao": "1d74570f971dcc4f3c00ea90fc4600546b8bdd64",
+    "arquivo": "audit.json",
+    "tamanho": 5279,
+    "sha256": "eba517228840db563a0e147eb73e92ec870c644850fb4d6ba8d6f40161f11592"
+  },
+  {
+    "fonte": "ai-safety-brazil/jailbreak-br-synthetic",
+    "revisao": "1d74570f971dcc4f3c00ea90fc4600546b8bdd64",
+    "arquivo": "data/test.parquet",
+    "tamanho": 326452,
+    "sha256": "80a69160a32a110884b6c987074e91898ae6e4bf47ad9b7b91cdbaa1b9e4ca28"
+  },
+  {
+    "fonte": "ai-safety-brazil/jailbreak-br-synthetic",
+    "revisao": "1d74570f971dcc4f3c00ea90fc4600546b8bdd64",
+    "arquivo": "data/train.parquet",
+    "tamanho": 2728684,
+    "sha256": "500bd85db1c5593f48a48d50aee90fad155331e7fed97972198ff83e54a29cc3"
+  },
+  {
+    "fonte": "ai-safety-brazil/jailbreak-br-synthetic",
+    "revisao": "1d74570f971dcc4f3c00ea90fc4600546b8bdd64",
+    "arquivo": "data/validation.parquet",
+    "tamanho": 309815,
+    "sha256": "8e0ec8a28537fda49aa99d70c75492449f004630d1d55e47632429c78910aea5"
+  },
+  {
+    "fonte": "ai-safety-brazil/jailbreak-br-synthetic",
+    "revisao": "1d74570f971dcc4f3c00ea90fc4600546b8bdd64",
+    "arquivo": "generation/families.json",
+    "tamanho": 368,
+    "sha256": "b7fcefdfd92c1ba4f670ee4945349176ca990c86329dab30c8946190a00e4c72"
+  },
+  {
+    "fonte": "ai-safety-brazil/jailbreak-br-synthetic",
+    "revisao": "1d74570f971dcc4f3c00ea90fc4600546b8bdd64",
+    "arquivo": "generation/protocol.json",
+    "tamanho": 2357,
+    "sha256": "65b6a5233a57ee03535e15a754d3a7df27a68e6e0af72b2daf56695c66de6a2c"
+  },
+  {
+    "fonte": "ai-safety-brazil/jailbreak-br-synthetic",
+    "revisao": "1d74570f971dcc4f3c00ea90fc4600546b8bdd64",
+    "arquivo": "manifest.json",
+    "tamanho": 4164,
+    "sha256": "bd60d2079ede6c584f56d6e20b5bcca3ad8fffff0c964fbef2b1c7f7bd439187"
+  },
+  {
+    "fonte": "Lakera/gandalf_ignore_instructions",
+    "revisao": "04737b65e90a6794ec227012e4a255a7def6344b",
+    "arquivo": "README.md",
+    "tamanho": 2828,
+    "sha256": "94e2abfab9caf8cb881098d16633334c2f63069e52440aaa94d7c150a8d8455f"
+  },
+  {
+    "fonte": "Lakera/gandalf_ignore_instructions",
+    "revisao": "04737b65e90a6794ec227012e4a255a7def6344b",
+    "arquivo": "data/test-00000-of-00001-bc92128b9288a6d1.parquet",
+    "tamanho": 7336,
+    "sha256": "56b646d133335ebc535266bd55dbe1b5bee7caa4b95bf49d040684b9b5dd9972"
+  },
+  {
+    "fonte": "Lakera/gandalf_ignore_instructions",
+    "revisao": "04737b65e90a6794ec227012e4a255a7def6344b",
+    "arquivo": "data/train-00000-of-00001-ded53be747ff55cd.parquet",
+    "tamanho": 36715,
+    "sha256": "5b6acf3e5a5998d21f8e1222bb45bbdec25a14408747b1cd63bebef4a75fa439"
+  },
+  {
+    "fonte": "Lakera/gandalf_ignore_instructions",
+    "revisao": "04737b65e90a6794ec227012e4a255a7def6344b",
+    "arquivo": "data/validation-00000-of-00001-94481a2a09ff2fff.parquet",
+    "tamanho": 7464,
+    "sha256": "f51ab3e3407a368845b0f57932cc745c09280429416d7507bd178a16326a79f6"
+  },
+  {
+    "fonte": "TrustAIRLab/in-the-wild-jailbreak-prompts",
+    "revisao": "a10aab8eff1c73165a442d4464dce192bd28b9c5",
+    "arquivo": "README.md",
+    "tamanho": 9542,
+    "sha256": "58219d1aae8a380b51296c61f9644891d8ba012765b0571484153cfe846c8388"
+  },
+  {
+    "fonte": "TrustAIRLab/in-the-wild-jailbreak-prompts",
+    "revisao": "a10aab8eff1c73165a442d4464dce192bd28b9c5",
+    "arquivo": "jailbreak_2023_05_07/train-00000-of-00001.parquet",
+    "tamanho": 656975,
+    "sha256": "70c5cd810b59089ac2c98ff4ac5a1b9b65598c35c57d010c9d3f0e31c3f0651f"
+  },
+  {
+    "fonte": "TrustAIRLab/in-the-wild-jailbreak-prompts",
+    "revisao": "a10aab8eff1c73165a442d4464dce192bd28b9c5",
+    "arquivo": "jailbreak_2023_12_25/train-00000-of-00001.parquet",
+    "tamanho": 1871641,
+    "sha256": "55bbc5e2be771ee16ed67aed4edb5ecef5f44ac69cea317a67e5405c5c6057a4"
+  },
+  {
+    "fonte": "TrustAIRLab/in-the-wild-jailbreak-prompts",
+    "revisao": "a10aab8eff1c73165a442d4464dce192bd28b9c5",
+    "arquivo": "regular_2023_05_07/train-00000-of-00001.parquet",
+    "tamanho": 3264474,
+    "sha256": "c5262077fdd8bacae8f2bc8b7bd56dc970d96c475b592f075800a8bc27210465"
+  },
+  {
+    "fonte": "TrustAIRLab/in-the-wild-jailbreak-prompts",
+    "revisao": "a10aab8eff1c73165a442d4464dce192bd28b9c5",
+    "arquivo": "regular_2023_12_25/train-00000-of-00001.parquet",
+    "tamanho": 12560543,
+    "sha256": "23e90010ccbc85574bf46678528cddce5b02abc86d9a047209218af65cb37c68"
+  },
+  {
+    "fonte": "Lakera/mosscap_prompt_injection",
+    "revisao": "b7e495ff63373ff7f7dabc1e9390cf62b5838570",
+    "arquivo": "README.md",
+    "tamanho": 3697,
+    "sha256": "f8774e6c4712fd55b1daa3f7b2f647bbf9316dbbc81ec3a9a7050d90eb6e3d45"
+  },
+  {
+    "fonte": "Lakera/mosscap_prompt_injection",
+    "revisao": "b7e495ff63373ff7f7dabc1e9390cf62b5838570",
+    "arquivo": "data/test-00000-of-00001-06acab2d6a2bcf9f.parquet",
+    "tamanho": 7036282,
+    "sha256": "9311f64ca579c947e43ff64ad4996585c51e4dae8ae747342926cf0091160d21"
+  },
+  {
+    "fonte": "Lakera/mosscap_prompt_injection",
+    "revisao": "b7e495ff63373ff7f7dabc1e9390cf62b5838570",
+    "arquivo": "data/train-00000-of-00001-07ae0ed17fa07cc1.parquet",
+    "tamanho": 49606158,
+    "sha256": "a3c354dd1457c0125243ed107a4cc3eafdc09b2c60eb7ce3e3854a2fbb12a4b2"
+  },
+  {
+    "fonte": "Lakera/mosscap_prompt_injection",
+    "revisao": "b7e495ff63373ff7f7dabc1e9390cf62b5838570",
+    "arquivo": "data/validation-00000-of-00001-e136a45438d15f16.parquet",
+    "tamanho": 7143330,
+    "sha256": "d6c112992c73a1744f540cc3f6d51ecafabdf4023ec2188de6dde31ca7e52d24"
+  },
+  {
+    "fonte": "microsoft/llmail-inject-challenge",
+    "revisao": "1063bdf01ec8762b812d5e06ee768a06faa5a6f7",
+    "arquivo": "README.md",
+    "tamanho": 23628,
+    "sha256": "d85767e349ab1abbaf43db9390c4e906e34954e5df3a1335c8f1516efa64e812"
+  },
+  {
+    "fonte": "microsoft/llmail-inject-challenge",
+    "revisao": "1063bdf01ec8762b812d5e06ee768a06faa5a6f7",
+    "arquivo": "data/emails_for_fp_tests.json",
+    "tamanho": 55486,
+    "sha256": "4ddd950b5dbaa8548f5597c886d8e09a051ba07f80a9291fdcca9c2397d22abe"
+  },
+  {
+    "fonte": "microsoft/llmail-inject-challenge",
+    "revisao": "1063bdf01ec8762b812d5e06ee768a06faa5a6f7",
+    "arquivo": "data/labelled_unique_submissions_phase2.json",
+    "tamanho": 68586935,
+    "sha256": "f89af984e345430c3b357903890e30867bf4676f4ef10c138cc7bad218e890b8"
+  },
+  {
+    "fonte": "microsoft/llmail-inject-challenge",
+    "revisao": "1063bdf01ec8762b812d5e06ee768a06faa5a6f7",
+    "arquivo": "data/levels_descriptions.json",
+    "tamanho": 884,
+    "sha256": "d1391d6fa8bb074b1603bb20699df6c1ada3c6add64db495e1a39faebc0cd400"
+  },
+  {
+    "fonte": "microsoft/llmail-inject-challenge",
+    "revisao": "1063bdf01ec8762b812d5e06ee768a06faa5a6f7",
+    "arquivo": "data/objectives_descriptions.json",
+    "tamanho": 379,
+    "sha256": "daed5cacc5126790073e1a8dfc650b8024c903c415f1e11a189a8171c0c0f183"
+  },
+  {
+    "fonte": "microsoft/llmail-inject-challenge",
+    "revisao": "1063bdf01ec8762b812d5e06ee768a06faa5a6f7",
+    "arquivo": "data/scenarios.json",
+    "tamanho": 38812,
+    "sha256": "3d7c55fd04826dd29fa11b9f9912ae270fffb16a6c52a7eb2bff00457d378e4f"
+  },
+  {
+    "fonte": "microsoft/llmail-inject-challenge",
+    "revisao": "1063bdf01ec8762b812d5e06ee768a06faa5a6f7",
+    "arquivo": "data/system_prompt.json",
+    "tamanho": 3065,
+    "sha256": "f5d0eb0b02f548476e32f39f190de7ebf1614c0816049c4d7b0047869c28131b"
+  },
+  {
+    "fonte": "deepset/prompt-injections",
+    "revisao": "4f61ecb038e9c3fb77e21034b22511b523772cdd",
+    "arquivo": "README.md",
+    "tamanho": 500,
+    "sha256": "d90b4518dfe06154deeec938243d1ec9119bdfbfd2105aee9cf1567999764b94"
+  },
+  {
+    "fonte": "deepset/prompt-injections",
+    "revisao": "4f61ecb038e9c3fb77e21034b22511b523772cdd",
+    "arquivo": "data/test-00000-of-00001-701d16158af87368.parquet",
+    "tamanho": 10892,
+    "sha256": "39ac797cabc157eeed58435a08593b2952bb6cb16fc394a2d383f447cc7b246e"
+  },
+  {
+    "fonte": "deepset/prompt-injections",
+    "revisao": "4f61ecb038e9c3fb77e21034b22511b523772cdd",
+    "arquivo": "data/train-00000-of-00001-9564e8b05b4757ab.parquet",
+    "tamanho": 40323,
+    "sha256": "2e10bc7ab30f542c97e4e83e2a5683000b5057d25ec10908784c631d44124c04"
+  },
+  {
+    "fonte": "leolee99/NotInject",
+    "revisao": "847ae76cf8fea5ed325429e569ae8cfef022d2e0",
+    "arquivo": "README.md",
+    "tamanho": 2973,
+    "sha256": "ffaf685021522a526f94af2047e5099ec6b7439a462c67e0ecaca0d631a0d43f"
+  },
+  {
+    "fonte": "leolee99/NotInject",
+    "revisao": "847ae76cf8fea5ed325429e569ae8cfef022d2e0",
+    "arquivo": "data/NotInject_one-00000-of-00001.parquet",
+    "tamanho": 10859,
+    "sha256": "5b1d3a8ec341205305efd8c6d2cabeb5ba0f594dd8726b08ee7fde1a46ddc6ec"
+  },
+  {
+    "fonte": "leolee99/NotInject",
+    "revisao": "847ae76cf8fea5ed325429e569ae8cfef022d2e0",
+    "arquivo": "data/NotInject_three-00000-of-00001.parquet",
+    "tamanho": 13009,
+    "sha256": "d5c685b123570c092a0f374ba6bdf324b2026d905a2751a243eb2bb360d411a8"
+  },
+  {
+    "fonte": "leolee99/NotInject",
+    "revisao": "847ae76cf8fea5ed325429e569ae8cfef022d2e0",
+    "arquivo": "data/NotInject_two-00000-of-00001.parquet",
+    "tamanho": 11183,
+    "sha256": "a5a8c1b3b851b0b5acc3b6caf8bfee26d7da631b2967dd31ca90358df8883feb"
+  },
+  {
+    "fonte": "leolee99/NotInject",
+    "revisao": "847ae76cf8fea5ed325429e569ae8cfef022d2e0",
+    "arquivo": "data/test-00000-of-00001.parquet",
+    "tamanho": 13009,
+    "sha256": "d5c685b123570c092a0f374ba6bdf324b2026d905a2751a243eb2bb360d411a8"
+  },
+  {
+    "fonte": "leolee99/NotInject",
+    "revisao": "847ae76cf8fea5ed325429e569ae8cfef022d2e0",
+    "arquivo": "data/train-00000-of-00001.parquet",
+    "tamanho": 10859,
+    "sha256": "5b1d3a8ec341205305efd8c6d2cabeb5ba0f594dd8726b08ee7fde1a46ddc6ec"
+  },
+  {
+    "fonte": "leolee99/NotInject",
+    "revisao": "847ae76cf8fea5ed325429e569ae8cfef022d2e0",
+    "arquivo": "data/validation-00000-of-00001.parquet",
+    "tamanho": 11183,
+    "sha256": "a5a8c1b3b851b0b5acc3b6caf8bfee26d7da631b2967dd31ca90358df8883feb"
+  },
+  {
+    "fonte": "OpenAssistant/oasst2",
+    "revisao": "179dd21fc55192153d94adb0e0ce8f69e222bf75",
+    "arquivo": "README.md",
+    "tamanho": 10606,
+    "sha256": "52bd472cf3cae04a4b21ecd5316f929741c47d991d4763b041c3a94de072dc31"
+  },
+  {
+    "fonte": "OpenAssistant/oasst2",
+    "revisao": "179dd21fc55192153d94adb0e0ce8f69e222bf75",
+    "arquivo": "data/train-00000-of-00001-88ba0162028a73fc.parquet",
+    "tamanho": 63494018,
+    "sha256": "9638227b41b0a4fb69afa5d5c4b52e3fb6abfd56c9870d81bae32c9981e769b1"
+  },
+  {
+    "fonte": "OpenAssistant/oasst2",
+    "revisao": "179dd21fc55192153d94adb0e0ce8f69e222bf75",
+    "arquivo": "data/validation-00000-of-00001-1deeef95c3248fe0.parquet",
+    "tamanho": 3180111,
+    "sha256": "fd46c63babc0756909a957ee40975bcf5610d58c5d1ab5ff2c57c0f57be1f273"
+  },
+  {
+    "fonte": "allenai/WildChat-1M",
+    "revisao": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+    "arquivo": "LICENSE.md",
+    "tamanho": 19947,
+    "sha256": "a7c7f6bdb20d261b8726c7594afb5832b36926e0cabfa116c41f58625bbc776c"
+  },
+  {
+    "fonte": "allenai/WildChat-1M",
+    "revisao": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+    "arquivo": "README.md",
+    "tamanho": 11168,
+    "sha256": "0bbf0494bdf60a3d8f644c155cb3c5f8fb21cb247045008f99bfc261e7e15162"
+  },
+  {
+    "fonte": "allenai/WildChat-1M",
+    "revisao": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+    "arquivo": "data/train-00000-of-00014.parquet",
+    "tamanho": 230786095,
+    "sha256": "abec2a13129db8c0e6a2d3a51ff12644873c748205a6fdf6551fbcb34430e51c"
+  },
+  {
+    "fonte": "allenai/WildChat-1M",
+    "revisao": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+    "arquivo": "data/train-00001-of-00014.parquet",
+    "tamanho": 215399142,
+    "sha256": "f10fa35bb52703baad5e3177d3382d63b855fce9e9d1b9ab1fe2f0e762464f2a"
+  },
+  {
+    "fonte": "allenai/WildChat-1M",
+    "revisao": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+    "arquivo": "data/train-00002-of-00014.parquet",
+    "tamanho": 205701692,
+    "sha256": "9a4912ec14c1012970f57b6710518dda17dbf6cdfb9b6e694880f5456b0b031f"
+  },
+  {
+    "fonte": "allenai/WildChat-1M",
+    "revisao": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+    "arquivo": "data/train-00003-of-00014.parquet",
+    "tamanho": 216891660,
+    "sha256": "3f2d50ee227e32848f6c4fdb0f8ea543b379b2219bec72be9446e232d3d2a670"
+  },
+  {
+    "fonte": "allenai/WildChat-1M",
+    "revisao": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+    "arquivo": "data/train-00004-of-00014.parquet",
+    "tamanho": 208292393,
+    "sha256": "08c7e0c31edc120606d67cfa82486471d82945a7a414761501ea44b1ab0cd804"
+  },
+  {
+    "fonte": "allenai/WildChat-1M",
+    "revisao": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+    "arquivo": "data/train-00005-of-00014.parquet",
+    "tamanho": 200855598,
+    "sha256": "1caab40d8d4f01d76d8e1fa03e80f31b2f4d8b8b4c47cb3aa0280f4467e04555"
+  },
+  {
+    "fonte": "allenai/WildChat-1M",
+    "revisao": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+    "arquivo": "data/train-00006-of-00014.parquet",
+    "tamanho": 189507683,
+    "sha256": "0bd2fff31c74feb6b44b0397b4e7ab6285dd69ccbe4cc8b5f19c42cdbf691303"
+  },
+  {
+    "fonte": "allenai/WildChat-1M",
+    "revisao": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+    "arquivo": "data/train-00007-of-00014.parquet",
+    "tamanho": 188410403,
+    "sha256": "f498ea6771be5bf00d259ec76bd9fba51ceaa99c76147a0bb95fd7fa1769b984"
+  },
+  {
+    "fonte": "allenai/WildChat-1M",
+    "revisao": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+    "arquivo": "data/train-00008-of-00014.parquet",
+    "tamanho": 180994027,
+    "sha256": "a69578183dde5de1aa94134da2d7c2d13f00d88a577ef91140a492fbbbf10792"
+  },
+  {
+    "fonte": "allenai/WildChat-1M",
+    "revisao": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+    "arquivo": "data/train-00009-of-00014.parquet",
+    "tamanho": 268963848,
+    "sha256": "d2eb8868323274c60c9fd5437eaf2159a08ac278598b1197bc20ac04c633648a"
+  },
+  {
+    "fonte": "allenai/WildChat-1M",
+    "revisao": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+    "arquivo": "data/train-00010-of-00014.parquet",
+    "tamanho": 336477988,
+    "sha256": "328b0d702d91ffd47e51aff2de56d74d0f2b874a31f2530f1948474a582f0467"
+  },
+  {
+    "fonte": "allenai/WildChat-1M",
+    "revisao": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+    "arquivo": "data/train-00011-of-00014.parquet",
+    "tamanho": 299818606,
+    "sha256": "a458b915aeab7a4a81bd18770f33c3ebb908c91e67d916db5525819c88dbe778"
+  },
+  {
+    "fonte": "allenai/WildChat-1M",
+    "revisao": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+    "arquivo": "data/train-00012-of-00014.parquet",
+    "tamanho": 282697282,
+    "sha256": "5353f1a829ac86de165c2fb537a30d7d756259dbe37a8a0fa6ec791321a37d6e"
+  },
+  {
+    "fonte": "allenai/WildChat-1M",
+    "revisao": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+    "arquivo": "data/train-00013-of-00014.parquet",
+    "tamanho": 336039603,
+    "sha256": "440be579bf012a6e98d179b8dd0bedd73634e5527f7000c067d19c88b5cefa6c"
+  }
+]

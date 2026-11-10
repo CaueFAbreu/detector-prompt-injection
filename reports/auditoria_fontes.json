@@ -1,0 +1,1078 @@
+{
+  "limite_caracteres": 4096,
+  "limites_faixas": [
+    16,
+    32,
+    64,
+    128,
+    256,
+    512,
+    1024,
+    2048,
+    4096,
+    8192,
+    16384
+  ],
+  "fontes": {
+    "ai-safety-brazil/prompt-injection-br-synthetic": {
+      "linhas": 10000,
+      "ids_unicos": true,
+      "vazios": 0,
+      "primeiras_mensagens": null,
+      "comprimento": {
+        "p50": 394,
+        "p95": 638,
+        "maximo": 1156,
+        "acima_do_limite": 0,
+        "faixas": [
+          0,
+          1,
+          4,
+          32,
+          992,
+          7001,
+          1964,
+          6,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "duplicatas_exatas": 0,
+      "duplicatas_chave": 0,
+      "chaves_com_rotulos_divergentes": 0,
+      "contagens": {
+        "arquivo": {
+          "data/train.parquet": 8000,
+          "data/test.parquet": 1000,
+          "data/validation.parquet": 1000
+        },
+        "rotulo_fonte": {
+          "0": 6000,
+          "1": 4000
+        },
+        "categoria_fonte": {
+          "attack_variant": 2000,
+          "authorized_change": 2000,
+          "embedded_attack": 2000,
+          "ordinary_content": 2000,
+          "quoted_instruction": 2000
+        },
+        "familia_fonte": {
+          "papel_administrativo_forjado": 1432,
+          "marcador_de_sistema_falso": 1416,
+          "falsa_prioridade": 1367,
+          "contaminacao_de_resposta": 1308,
+          "falsa_autoridade": 1259,
+          "desvio_de_tarefa": 1218,
+          "pedido_de_confirmacao_falso": 511,
+          "instrucao_multilingue": 489,
+          "instrucao_aninhada": 351,
+          "redirecionamento_em_resultado_de_ferramenta": 329,
+          "falsa_atualizacao_de_politica": 320
+        },
+        "idioma_fonte": {
+          "pt": 10000
+        }
+      }
+    },
+    "ai-safety-brazil/jailbreak-br-synthetic": {
+      "linhas": 10000,
+      "ids_unicos": true,
+      "vazios": 0,
+      "primeiras_mensagens": null,
+      "comprimento": {
+        "p50": 368,
+        "p95": 684,
+        "maximo": 1256,
+        "acima_do_limite": 0,
+        "faixas": [
+          0,
+          16,
+          195,
+          1006,
+          1391,
+          5257,
+          2126,
+          9,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "duplicatas_exatas": 0,
+      "duplicatas_chave": 0,
+      "chaves_com_rotulos_divergentes": 0,
+      "contagens": {
+        "arquivo": {
+          "data/train.parquet": 8000,
+          "data/test.parquet": 1000,
+          "data/validation.parquet": 1000
+        },
+        "rotulo_fonte": {
+          "0": 6000,
+          "1": 4000
+        },
+        "categoria_fonte": {
+          "attack_variant": 2000,
+          "benign_roleplay": 2000,
+          "benign_sensitive": 2000,
+          "direct_unsafe_request": 2000,
+          "jailbreak_attempt": 2000
+        },
+        "familia_fonte": {
+          "cenario_hipotetico": 1368,
+          "falsa_autoridade": 1362,
+          "pedido_de_excecao": 1354,
+          "personagem": 1346,
+          "alegacao_de_pesquisa": 1303,
+          "simulacao_de_treinamento": 1267,
+          "continuacao_de_texto": 500,
+          "transformacao_de_formato": 500,
+          "reformulacao_multilingue": 346,
+          "dialogo_ficcional_encadeado": 334,
+          "decomposicao_de_pedido": 320
+        },
+        "idioma_fonte": {
+          "pt": 10000
+        }
+      }
+    },
+    "Lakera/gandalf_ignore_instructions": {
+      "linhas": 1000,
+      "ids_unicos": true,
+      "vazios": 0,
+      "primeiras_mensagens": null,
+      "comprimento": {
+        "p50": 61,
+        "p95": 163,
+        "maximo": 516,
+        "acima_do_limite": 0,
+        "faixas": [
+          5,
+          120,
+          419,
+          352,
+          94,
+          9,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "duplicatas_exatas": 0,
+      "duplicatas_chave": 1,
+      "chaves_com_rotulos_divergentes": 0,
+      "contagens": {
+        "arquivo": {
+          "data/train-00000-of-00001-ded53be747ff55cd.parquet": 777,
+          "data/test-00000-of-00001-bc92128b9288a6d1.parquet": 112,
+          "data/validation-00000-of-00001-94481a2a09ff2fff.parquet": 111
+        },
+        "rotulo_fonte": {
+          "(ausente)": 1000
+        },
+        "categoria_fonte": {
+          "(ausente)": 1000
+        },
+        "familia_fonte": {
+          "(ausente)": 1000
+        },
+        "idioma_fonte": {
+          "en": 1000
+        }
+      }
+    },
+    "TrustAIRLab/in-the-wild-jailbreak-prompts": {
+      "linhas": 21527,
+      "ids_unicos": true,
+      "vazios": 0,
+      "primeiras_mensagens": null,
+      "comprimento": {
+        "p50": 833,
+        "p95": 5249,
+        "maximo": 70972,
+        "acima_do_limite": 1838,
+        "faixas": [
+          151,
+          160,
+          375,
+          909,
+          1907,
+          4177,
+          4503,
+          4371,
+          3136,
+          1404,
+          366,
+          68
+        ]
+      },
+      "duplicatas_exatas": 2980,
+      "duplicatas_chave": 6463,
+      "chaves_com_rotulos_divergentes": 43,
+      "contagens": {
+        "arquivo": {
+          "regular_2023_12_25/train-00000-of-00001.parquet": 13735,
+          "regular_2023_05_07/train-00000-of-00001.parquet": 5721,
+          "jailbreak_2023_12_25/train-00000-of-00001.parquet": 1405,
+          "jailbreak_2023_05_07/train-00000-of-00001.parquet": 666
+        },
+        "rotulo_fonte": {
+          "False": 19456,
+          "True": 2071
+        },
+        "categoria_fonte": {
+          "regular_2023_12_25": 13735,
+          "regular_2023_05_07": 5721,
+          "jailbreak_2023_12_25": 1405,
+          "jailbreak_2023_05_07": 666
+        },
+        "familia_fonte": {
+          "(ausente)": 21527
+        },
+        "idioma_fonte": {
+          "en": 21527
+        }
+      }
+    },
+    "Lakera/mosscap_prompt_injection": {
+      "linhas": 278945,
+      "ids_unicos": true,
+      "vazios": 29,
+      "primeiras_mensagens": null,
+      "comprimento": {
+        "p50": 56,
+        "p95": 410,
+        "maximo": 27027,
+        "acima_do_limite": 1518,
+        "faixas": [
+          15426,
+          52815,
+          86626,
+          62340,
+          34547,
+          16834,
+          5677,
+          2073,
+          1089,
+          886,
+          627,
+          5
+        ]
+      },
+      "duplicatas_exatas": 57895,
+      "duplicatas_chave": 66432,
+      "chaves_com_rotulos_divergentes": 0,
+      "contagens": {
+        "arquivo": {
+          "data/train-00000-of-00001-07ae0ed17fa07cc1.parquet": 223533,
+          "data/test-00000-of-00001-06acab2d6a2bcf9f.parquet": 27729,
+          "data/validation-00000-of-00001-e136a45438d15f16.parquet": 27683
+        },
+        "rotulo_fonte": {
+          "(ausente)": 278945
+        },
+        "categoria_fonte": {
+          "Level 8": 109767,
+          "Level 3": 49914,
+          "Level 4": 36395,
+          "Level 7": 34391,
+          "Level 2": 16564,
+          "Level 5": 14436,
+          "Level 6": 9783,
+          "Level 1": 7695
+        },
+        "familia_fonte": {
+          "(ausente)": 278945
+        },
+        "idioma_fonte": {
+          "en": 278945
+        }
+      }
+    },
+    "microsoft/llmail-inject-challenge": {
+      "linhas": 37506,
+      "ids_unicos": true,
+      "vazios": 0,
+      "primeiras_mensagens": null,
+      "comprimento": {
+        "p50": 548,
+        "p95": 3689,
+        "maximo": 32563,
+        "acima_do_limite": 1472,
+        "faixas": [
+          0,
+          0,
+          136,
+          591,
+          3066,
+          14059,
+          7123,
+          5961,
+          5098,
+          1320,
+          108,
+          44
+        ]
+      },
+      "duplicatas_exatas": 43,
+      "duplicatas_chave": 929,
+      "chaves_com_rotulos_divergentes": 85,
+      "contagens": {
+        "arquivo": {
+          "data/labelled_unique_submissions_phase2.json": 37303,
+          "data/emails_for_fp_tests.json": 203
+        },
+        "rotulo_fonte": {
+          "True": 21007,
+          "Unclear": 13796,
+          "False": 2500,
+          "benigno": 203
+        },
+        "categoria_fonte": {
+          "judge": 34138,
+          "api_triggered": 3165,
+          "(ausente)": 203
+        },
+        "familia_fonte": {
+          "(ausente)": 37506
+        },
+        "idioma_fonte": {
+          "en": 37506
+        }
+      }
+    },
+    "deepset/prompt-injections": {
+      "linhas": 662,
+      "ids_unicos": true,
+      "vazios": 0,
+      "primeiras_mensagens": null,
+      "comprimento": {
+        "p50": 65,
+        "p95": 339,
+        "maximo": 4545,
+        "acima_do_limite": 1,
+        "faixas": [
+          11,
+          106,
+          212,
+          158,
+          116,
+          43,
+          13,
+          2,
+          0,
+          1,
+          0,
+          0
+        ]
+      },
+      "duplicatas_exatas": 0,
+      "duplicatas_chave": 0,
+      "chaves_com_rotulos_divergentes": 0,
+      "contagens": {
+        "arquivo": {
+          "data/train-00000-of-00001-9564e8b05b4757ab.parquet": 546,
+          "data/test-00000-of-00001-701d16158af87368.parquet": 116
+        },
+        "rotulo_fonte": {
+          "0": 399,
+          "1": 263
+        },
+        "categoria_fonte": {
+          "(ausente)": 662
+        },
+        "familia_fonte": {
+          "(ausente)": 662
+        },
+        "idioma_fonte": {
+          "(ausente)": 662
+        }
+      }
+    },
+    "leolee99/NotInject": {
+      "linhas": 339,
+      "ids_unicos": true,
+      "vazios": 0,
+      "primeiras_mensagens": null,
+      "comprimento": {
+        "p50": 90,
+        "p95": 159,
+        "maximo": 233,
+        "acima_do_limite": 0,
+        "faixas": [
+          15,
+          51,
+          31,
+          185,
+          57,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "duplicatas_exatas": 0,
+      "duplicatas_chave": 0,
+      "chaves_com_rotulos_divergentes": 0,
+      "contagens": {
+        "arquivo": {
+          "data/NotInject_one-00000-of-00001.parquet": 113,
+          "data/NotInject_three-00000-of-00001.parquet": 113,
+          "data/NotInject_two-00000-of-00001.parquet": 113
+        },
+        "rotulo_fonte": {
+          "(ausente)": 339
+        },
+        "categoria_fonte": {
+          "Common Queries": 126,
+          "Technique Queries": 87,
+          "Multilingual": 84,
+          "Virtual Creation": 42
+        },
+        "familia_fonte": {
+          "(ausente)": 339
+        },
+        "idioma_fonte": {
+          "en": 339
+        }
+      }
+    },
+    "OpenAssistant/oasst2": {
+      "linhas": 49856,
+      "ids_unicos": true,
+      "vazios": 0,
+      "primeiras_mensagens": 13854,
+      "comprimento": {
+        "p50": 71,
+        "p95": 356,
+        "maximo": 9843,
+        "acima_do_limite": 40,
+        "faixas": [
+          3506,
+          5661,
+          13283,
+          14590,
+          8258,
+          3112,
+          857,
+          425,
+          124,
+          35,
+          5,
+          0
+        ]
+      },
+      "duplicatas_exatas": 769,
+      "duplicatas_chave": 862,
+      "chaves_com_rotulos_divergentes": 0,
+      "contagens": {
+        "arquivo": {
+          "data/train-00000-of-00001-88ba0162028a73fc.parquet": 47443,
+          "data/validation-00000-of-00001-1deeef95c3248fe0.parquet": 2413
+        },
+        "rotulo_fonte": {
+          "(ausente)": 49856
+        },
+        "categoria_fonte": {
+          "(ausente)": 48677,
+          "deleted": 1179
+        },
+        "familia_fonte": {
+          "(ausente)": 49856
+        },
+        "idioma_fonte": {
+          "en": 23932,
+          "es": 9260,
+          "ru": 5710,
+          "zh": 3199,
+          "de": 2461,
+          "fr": 1530,
+          "pt-BR": 1026,
+          "th": 684,
+          "ca": 403,
+          "uk-UA": 379,
+          "it": 331,
+          "ja": 318,
+          "pl": 164,
+          "eo": 126,
+          "eu": 69,
+          "fi": 63,
+          "vi": 61,
+          "hu": 42,
+          "nl": 28,
+          "ar": 24,
+          "da": 11,
+          "tr": 10,
+          "he": 9,
+          "ko": 9,
+          "cs": 4,
+          "id": 3
+        }
+      }
+    },
+    "allenai/WildChat-1M": {
+      "linhas": 1960074,
+      "ids_unicos": true,
+      "vazios": 17047,
+      "primeiras_mensagens": 837989,
+      "comprimento": {
+        "p50": 84,
+        "p95": 3857,
+        "maximo": 597942,
+        "acima_do_limite": 71913,
+        "faixas": [
+          264560,
+          238912,
+          346918,
+          313450,
+          227796,
+          170992,
+          112796,
+          79476,
+          133261,
+          36483,
+          25384,
+          10046
+        ]
+      },
+      "duplicatas_exatas": 236064,
+      "duplicatas_chave": 255127,
+      "chaves_com_rotulos_divergentes": 0,
+      "contagens": {
+        "arquivo": {
+          "data/train-00000-of-00014.parquet": 172418,
+          "data/train-00001-of-00014.parquet": 162313,
+          "data/train-00003-of-00014.parquet": 154054,
+          "data/train-00004-of-00014.parquet": 151952,
+          "data/train-00013-of-00014.parquet": 146818,
+          "data/train-00002-of-00014.parquet": 144923,
+          "data/train-00009-of-00014.parquet": 144847,
+          "data/train-00010-of-00014.parquet": 142494,
+          "data/train-00011-of-00014.parquet": 135306,
+          "data/train-00012-of-00014.parquet": 133840,
+          "data/train-00006-of-00014.parquet": 120253,
+          "data/train-00007-of-00014.parquet": 119730,
+          "data/train-00008-of-00014.parquet": 118775,
+          "data/train-00005-of-00014.parquet": 112351
+        },
+        "rotulo_fonte": {
+          "(ausente)": 1960074
+        },
+        "categoria_fonte": {
+          "(ausente)": 1960074
+        },
+        "familia_fonte": {
+          "(ausente)": 1960074
+        },
+        "idioma_fonte": {
+          "English": 980259,
+          "Chinese": 329474,
+          "Russian": 217812,
+          "French": 66137,
+          "Spanish": 52692,
+          "Arabic": 30370,
+          "German": 29369,
+          "Portuguese": 24964,
+          "Nolang": 17047,
+          "Latin": 15829,
+          "Italian": 15197,
+          "Turkish": 14827,
+          "Vietnamese": 12476,
+          "Korean": 12458,
+          "Persian": 11015,
+          "Japanese": 10584,
+          "Polish": 10562,
+          "Maori": 9969,
+          "Indonesian": 8259,
+          "Sotho": 7157,
+          "Dutch": 6528,
+          "Afrikaans": 5650,
+          "Tagalog": 5537,
+          "Ukrainian": 4891,
+          "Hungarian": 3853,
+          "Romanian": 3455,
+          "Welsh": 3067,
+          "Tswana": 2945,
+          "Malay": 2739,
+          "Yoruba": 2575,
+          "Esperanto": 2517,
+          "Somali": 2444,
+          "Danish": 2330,
+          "Catalan": 2128,
+          "Swedish": 1875,
+          "Bulgarian": 1869,
+          "Swahili": 1781,
+          "Greek": 1624,
+          "Czech": 1621,
+          "Bokmal": 1570,
+          "Tsonga": 1555,
+          "Lithuanian": 1541,
+          "Finnish": 1538,
+          "Estonian": 1355,
+          "Nynorsk": 1354,
+          "Xhosa": 1274,
+          "Albanian": 1117,
+          "Slovene": 1034,
+          "Irish": 873,
+          "Macedonian": 869,
+          "Bosnian": 859,
+          "Shona": 837,
+          "Slovak": 827,
+          "Zulu": 754,
+          "Basque": 733,
+          "Croatian": 711,
+          "Serbian": 700,
+          "Hebrew": 558,
+          "Hindi": 530,
+          "Ganda": 520,
+          "Mongolian": 453,
+          "Azerbaijani": 446,
+          "Belarusian": 407,
+          "Latvian": 402,
+          "Kazakh": 397,
+          "Thai": 338,
+          "Urdu": 312,
+          "Icelandic": 194,
+          "Bengali": 85,
+          "Marathi": 21,
+          "Armenian": 14,
+          "Georgian": 5,
+          "Gujarati": 4,
+          "Punjabi": 1
+        }
+      }
+    }
+  },
+  "sobreposicao": {
+    "ai-safety-brazil/prompt-injection-br-synthetic": {
+      "ai-safety-brazil/prompt-injection-br-synthetic": {
+        "textos": 10000,
+        "mediana_comprimento": 394
+      },
+      "ai-safety-brazil/jailbreak-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "Lakera/gandalf_ignore_instructions": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "TrustAIRLab/in-the-wild-jailbreak-prompts": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "Lakera/mosscap_prompt_injection": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "microsoft/llmail-inject-challenge": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "deepset/prompt-injections": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "leolee99/NotInject": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "OpenAssistant/oasst2": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "allenai/WildChat-1M": {
+        "textos": 0,
+        "mediana_comprimento": null
+      }
+    },
+    "ai-safety-brazil/jailbreak-br-synthetic": {
+      "ai-safety-brazil/prompt-injection-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "ai-safety-brazil/jailbreak-br-synthetic": {
+        "textos": 10000,
+        "mediana_comprimento": 368
+      },
+      "Lakera/gandalf_ignore_instructions": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "TrustAIRLab/in-the-wild-jailbreak-prompts": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "Lakera/mosscap_prompt_injection": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "microsoft/llmail-inject-challenge": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "deepset/prompt-injections": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "leolee99/NotInject": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "OpenAssistant/oasst2": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "allenai/WildChat-1M": {
+        "textos": 0,
+        "mediana_comprimento": null
+      }
+    },
+    "Lakera/gandalf_ignore_instructions": {
+      "ai-safety-brazil/prompt-injection-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "ai-safety-brazil/jailbreak-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "Lakera/gandalf_ignore_instructions": {
+        "textos": 999,
+        "mediana_comprimento": 61
+      },
+      "TrustAIRLab/in-the-wild-jailbreak-prompts": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "Lakera/mosscap_prompt_injection": {
+        "textos": 11,
+        "mediana_comprimento": 32
+      },
+      "microsoft/llmail-inject-challenge": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "deepset/prompt-injections": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "leolee99/NotInject": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "OpenAssistant/oasst2": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "allenai/WildChat-1M": {
+        "textos": 0,
+        "mediana_comprimento": null
+      }
+    },
+    "TrustAIRLab/in-the-wild-jailbreak-prompts": {
+      "ai-safety-brazil/prompt-injection-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "ai-safety-brazil/jailbreak-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "Lakera/gandalf_ignore_instructions": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "TrustAIRLab/in-the-wild-jailbreak-prompts": {
+        "textos": 15064,
+        "mediana_comprimento": 894
+      },
+      "Lakera/mosscap_prompt_injection": {
+        "textos": 36,
+        "mediana_comprimento": 426
+      },
+      "microsoft/llmail-inject-challenge": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "deepset/prompt-injections": {
+        "textos": 5,
+        "mediana_comprimento": 448
+      },
+      "leolee99/NotInject": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "OpenAssistant/oasst2": {
+        "textos": 18,
+        "mediana_comprimento": 16
+      },
+      "allenai/WildChat-1M": {
+        "textos": 167,
+        "mediana_comprimento": 825
+      }
+    },
+    "Lakera/mosscap_prompt_injection": {
+      "ai-safety-brazil/prompt-injection-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "ai-safety-brazil/jailbreak-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "Lakera/gandalf_ignore_instructions": {
+        "textos": 11,
+        "mediana_comprimento": 32
+      },
+      "TrustAIRLab/in-the-wild-jailbreak-prompts": {
+        "textos": 36,
+        "mediana_comprimento": 426
+      },
+      "Lakera/mosscap_prompt_injection": {
+        "textos": 212513,
+        "mediana_comprimento": 62
+      },
+      "microsoft/llmail-inject-challenge": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "deepset/prompt-injections": {
+        "textos": 6,
+        "mediana_comprimento": 17
+      },
+      "leolee99/NotInject": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "OpenAssistant/oasst2": {
+        "textos": 175,
+        "mediana_comprimento": 9
+      },
+      "allenai/WildChat-1M": {
+        "textos": 1021,
+        "mediana_comprimento": 12
+      }
+    },
+    "microsoft/llmail-inject-challenge": {
+      "ai-safety-brazil/prompt-injection-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "ai-safety-brazil/jailbreak-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "Lakera/gandalf_ignore_instructions": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "TrustAIRLab/in-the-wild-jailbreak-prompts": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "Lakera/mosscap_prompt_injection": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "microsoft/llmail-inject-challenge": {
+        "textos": 36577,
+        "mediana_comprimento": 540
+      },
+      "deepset/prompt-injections": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "leolee99/NotInject": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "OpenAssistant/oasst2": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "allenai/WildChat-1M": {
+        "textos": 0,
+        "mediana_comprimento": null
+      }
+    },
+    "deepset/prompt-injections": {
+      "ai-safety-brazil/prompt-injection-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "ai-safety-brazil/jailbreak-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "Lakera/gandalf_ignore_instructions": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "TrustAIRLab/in-the-wild-jailbreak-prompts": {
+        "textos": 5,
+        "mediana_comprimento": 448
+      },
+      "Lakera/mosscap_prompt_injection": {
+        "textos": 6,
+        "mediana_comprimento": 17
+      },
+      "microsoft/llmail-inject-challenge": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "deepset/prompt-injections": {
+        "textos": 662,
+        "mediana_comprimento": 65
+      },
+      "leolee99/NotInject": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "OpenAssistant/oasst2": {
+        "textos": 2,
+        "mediana_comprimento": 12
+      },
+      "allenai/WildChat-1M": {
+        "textos": 7,
+        "mediana_comprimento": 28
+      }
+    },
+    "leolee99/NotInject": {
+      "ai-safety-brazil/prompt-injection-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "ai-safety-brazil/jailbreak-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "Lakera/gandalf_ignore_instructions": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "TrustAIRLab/in-the-wild-jailbreak-prompts": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "Lakera/mosscap_prompt_injection": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "microsoft/llmail-inject-challenge": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "deepset/prompt-injections": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "leolee99/NotInject": {
+        "textos": 339,
+        "mediana_comprimento": 90
+      },
+      "OpenAssistant/oasst2": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "allenai/WildChat-1M": {
+        "textos": 0,
+        "mediana_comprimento": null
+      }
+    },
+    "OpenAssistant/oasst2": {
+      "ai-safety-brazil/prompt-injection-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "ai-safety-brazil/jailbreak-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "Lakera/gandalf_ignore_instructions": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "TrustAIRLab/in-the-wild-jailbreak-prompts": {
+        "textos": 18,
+        "mediana_comprimento": 16
+      },
+      "Lakera/mosscap_prompt_injection": {
+        "textos": 175,
+        "mediana_comprimento": 9
+      },
+      "microsoft/llmail-inject-challenge": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "deepset/prompt-injections": {
+        "textos": 2,
+        "mediana_comprimento": 12
+      },
+      "leolee99/NotInject": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "OpenAssistant/oasst2": {
+        "textos": 48994,
+        "mediana_comprimento": 73
+      },
+      "allenai/WildChat-1M": {
+        "textos": 602,
+        "mediana_comprimento": 9
+      }
+    },
+    "allenai/WildChat-1M": {
+      "ai-safety-brazil/prompt-injection-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "ai-safety-brazil/jailbreak-br-synthetic": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "Lakera/gandalf_ignore_instructions": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "TrustAIRLab/in-the-wild-jailbreak-prompts": {
+        "textos": 167,
+        "mediana_comprimento": 825
+      },
+      "Lakera/mosscap_prompt_injection": {
+        "textos": 1021,
+        "mediana_comprimento": 12
+      },
+      "microsoft/llmail-inject-challenge": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "deepset/prompt-injections": {
+        "textos": 7,
+        "mediana_comprimento": 28
+      },
+      "leolee99/NotInject": {
+        "textos": 0,
+        "mediana_comprimento": null
+      },
+      "OpenAssistant/oasst2": {
+        "textos": 602,
+        "mediana_comprimento": 9
+      },
+      "allenai/WildChat-1M": {
+        "textos": 1704947,
+        "mediana_comprimento": 84
+      }
+    }
+  }
+}
