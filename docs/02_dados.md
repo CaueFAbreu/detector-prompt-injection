@@ -236,9 +236,9 @@ Um estrato por valor de rótulo nas fontes rotuladas e um por fonte nas demais, 
 
 São 17 estratos e 340 textos. Regras do sorteio:
 
-- semente `42`, sorteio uniforme dentro do estrato;
-- só textos válidos como entrada (seção 4.1 da especificação): chave não vazia e até 4.096 caracteres;
-- no máximo um texto por chave de comparação dentro da amostra;
+- sorteio uniforme entre as **chaves de comparação distintas** do estrato, e não entre as linhas: cada chave recebe a nota `sha256("42:" + chave)`, e o estrato fica com as chaves de menor nota. A primeira fase usa as 20 primeiras, e a segunda continua a mesma fila (posições 21 a 50);
+- quando uma chave aparece em mais de uma linha do estrato, entra a de menor `id_original`;
+- só textos válidos como entrada (seção 4.1 da especificação): chave não vazia e até 4.096 caracteres no texto bruto, já que a normalização do modelo ainda não existe;
 - no oasst2 e no WildChat, todas as mensagens do usuário, e não só a primeira (DD8).
 
 A anotação é **às cegas**: a planilha mostra só um identificador da amostra e o texto, com as fontes embaralhadas. A fonte, o `id_original` e o rótulo da fonte ficam num arquivo separado, consultado só depois da anotação. A anotação é feita por uma única pessoa (o autor do projeto), e a amostra servirá depois como referência para validar um anotador automático na construção do dataset.
