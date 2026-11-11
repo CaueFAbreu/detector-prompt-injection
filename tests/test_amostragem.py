@@ -1,7 +1,17 @@
 import pandas as pd
+import pytest
+from openpyxl import load_workbook
 
 from src import leitura
-from src.amostragem import COLUNAS_ANOTACAO, estrato, montar_fase1, nota, selecionar
+from src.amostragem import (
+    COLUNAS_ANOTACAO,
+    estrato,
+    gravar_planilha,
+    montar_fase1,
+    nota,
+    selecionar,
+    tornar_seguro,
+)
 from src.auditoria import chave_comparacao
 
 FONTE = "autor/fonte"
@@ -144,3 +154,65 @@ def test_fase1_embaralha_as_fontes_de_forma_deterministica():
 
     assert planilha.equals(repetida)
     assert list(chave["estrato"]) != sorted(chave["estrato"])
+
+
+def _planilha(textos):
+    planilha = pd.DataFrame({"id_amostra": [f"A{i:04d}" for i in range(1, len(textos) + 1)]})
+    planilha["texto"] = textos
+    for coluna in COLUNAS_ANOTACAO:
+        planilha[coluna] = ""
+    return planilha
+
+
+def test_tornar_seguro_marca_caracteres_de_controle_e_preserva_quebras():
+    texto = "a" + chr(7) + "b" + chr(0) + "\tc\nd"
+
+    assert tornar_seguro(texto) == "a[U+0007]b[U+0000]\tc\nd"
+
+
+def test_gravar_planilha_mantem_formulas_como_texto(tmp_path):
+    caminho = tmp_path / "planilha.xlsx"
+    textos = ["=1+1", '=HYPERLINK("http://exemplo.com")', "+SOMA(A1)", "texto comum"]
+
+    gravar_planilha(_planilha(textos), caminho)
+
+    folha = load_workbook(caminho)["anotacao"]
+    celulas = [folha.cell(row=i, column=2) for i in range(2, 6)]
+    assert [celula.value for celula in celulas] == textos
+    assert {celula.data_type for celula in celulas} == {"s"}
+
+
+def test_gravar_planilha_marca_caracteres_de_controle(tmp_path):
+    caminho = tmp_path / "planilha.xlsx"
+
+    gravar_planilha(_planilha(["a" + chr(7) + "b"]), caminho)
+
+    assert load_workbook(caminho)["anotacao"].cell(row=2, column=2).value == "a[U+0007]b"
+
+
+def test_gravar_planilha_tem_cabecalho_e_listas_suspensas(tmp_path):
+    caminho = tmp_path / "planilha.xlsx"
+
+    gravar_planilha(_planilha(["a", "b"]), caminho)
+
+    folha = load_workbook(caminho)["anotacao"]
+    cabecalho = [celula.value for celula in folha[1]]
+    assert cabecalho == ["id_amostra", "texto", *COLUNAS_ANOTACAO]
+    assert folha.cell(row=2, column=3).value is None
+    listas = {str(v.sqref): v.formula1 for v in folha.data_validations.dataValidation}
+    assert listas == {
+        "C2:C3": '"ataque,sem_ataque,incerto"',
+        "D2:D3": '"indireta,ofuscacao,persona,vazamento,sobrescrita"',
+        "E2:E3": '"sim,nao"',
+        "F2:F3": '"pt,en,misto,outro"',
+    }
+
+
+def test_gravar_planilha_nao_sobrescreve_arquivo_existente(tmp_path):
+    caminho = tmp_path / "planilha.xlsx"
+    caminho.write_bytes(b"anotacoes")
+
+    with pytest.raises(FileExistsError):
+        gravar_planilha(_planilha(["a"]), caminho)
+
+    assert caminho.read_bytes() == b"anotacoes"

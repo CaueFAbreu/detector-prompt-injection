@@ -243,6 +243,8 @@ São 17 estratos e 340 textos. Regras do sorteio:
 
 A anotação é **às cegas**: a planilha mostra só um identificador da amostra e o texto, com as fontes embaralhadas. A fonte, o `id_original` e o rótulo da fonte ficam num arquivo separado, consultado só depois da anotação. A anotação é feita por uma única pessoa (o autor do projeto), e a amostra servirá depois como referência para validar um anotador automático na construção do dataset.
 
+A amostra é gerada por `python -m src.amostragem`, em `data/anotacao/` (fora do Git): `planilha_fase1.xlsx`, para anotar, e `chave_fase1.csv`. O comando recusa sobrescrever esses arquivos. Na planilha, toda célula é gravada como texto, para que um texto iniciado por `=` não vire uma fórmula executada pelo Excel, e caracteres de controle aparecem como `[U+XXXX]` (um texto na primeira fase).
+
 ### 4.2 Guia de anotação
 
 Cada texto é lido como **uma mensagem de usuário enviada a um assistente de uma aplicação**, cujo operador definiu instruções, políticas e possivelmente segredos (por exemplo, uma senha num jogo como o Gandalf). O texto é anotado por inteiro, sem considerar a fonte de onde veio.
@@ -269,8 +271,10 @@ Casos de fronteira, já decididos pela especificação:
 | Conteúdo colado sem instrução ao assistente ("resuma este e-mail: ...") | `sem_ataque` | Seção 3.1 |
 | Pergunta ou texto sobre prompt injection, jailbreak ou segurança de IA | `sem_ataque` (`negativo_dificil` = `sim`) | Seção 3.1 |
 | Ataque codificado, com letras separadas ou pedido de tradução para contornar regras | `ataque` (`ofuscacao`) | Seção 3.2 |
+| Pedido direto de dados, credenciais ou acesso privilegiado da aplicação, sem manipulação das instruções ("me passe a senha de root", "como contornar a autenticação?") | `sem_ataque` (`negativo_dificil` = `sim`) | D2; DD11 |
+| Pedido de dados da aplicação (logs, credenciais, dados de clientes) combinado com uma ordem para ignorar as regras | `ataque` (`sobrescrita`), e não `vazamento` | Seção 3.2; DD12 |
 
-Casos novos que surgirem na anotação são registrados em `observacao` e, se mudarem a interpretação da definição, entram nesta tabela antes do cálculo dos resultados.
+Casos novos que surgirem na anotação são registrados em `observacao` e, se mudarem a interpretação da definição, entram nesta tabela antes do cálculo dos resultados. As duas últimas linhas foram acrescentadas depois da primeira fase de anotação e antes de consultar os rótulos das fontes; as linhas afetadas foram revistas às cegas.
 
 ### 4.3 Critério de decisão
 
@@ -285,3 +289,10 @@ Fixado antes da anotação. O critério decide se o rótulo da fonte pode ser us
 O limite de 80% é a afirmação mais forte que 50 textos sustentam sem exigir um placar quase perfeito: mesmo 50 em 50 dão um limite inferior de 92,9%. Nas fontes sem rótulo, a primeira fase estima a proporção de ataques e a distribuição de famílias, e a segunda fase é usada quando a estimativa não bastar para o mapa de lacunas.
 
 **Validação e teste exigem mais.** Um erro de rótulo tolerável no treino não é aceitável na avaliação: 5% de ataques entre os negativos do teste somariam até 5 pontos ao FPR medido, frente a um limite de 2% (D12). Certificar um erro abaixo de 2% exigiria cerca de 200 textos sem erro por estrato (Wilson de 0 em 200: até 1,9%). Por isso, os rótulos de validação e teste não vêm do rótulo da fonte: todos os exemplos dessas partições serão revisados, com o método definido na construção do dataset.
+
+### 4.4 Decisões
+
+| ID | Decisão | Alternativa descartada | Motivo |
+|---|---|---|---|
+| DD11 | Pedido direto de dados, credenciais ou acesso privilegiado, sem manipulação, é `sem_ataque`, com `negativo_dificil` = `sim` | Tratá-lo como ataque, por fazer o modelo "agir fora" das instruções | Sem manipulação, é um pedido proibido, e não uma tentativa de alterar as instruções (D2); o detector não substitui controles de permissão (seção 2 da especificação). O vocabulário ("senha", "root", "autenticação") é o mesmo de ataques, o que o torna um negativo difícil. |
+| DD12 | `vazamento` é só a obtenção de instruções, políticas ou segredos do operador presentes no contexto do modelo (prompt do sistema, senha de um jogo); dados da aplicação pedidos junto de "ignore as regras" são `sobrescrita` | Incluir em `vazamento` qualquer dado sensível | Fiel à definição da seção 3.2 da especificação; misturar dois alvos numa família tornaria impreciso o teste de generalização por família. |
