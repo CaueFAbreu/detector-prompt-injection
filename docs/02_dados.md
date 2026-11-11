@@ -216,3 +216,72 @@ Segundo o idioma informado pelas fontes: 24.964 mensagens do usuário no WildCha
 - **Limite de entrada.** 71.913 mensagens do WildChat (3,7%) e 1.838 do TrustAIRLab passam de 4.096 caracteres e seriam entradas inválidas (seção 4.1 da especificação).
 - **Mensagens vazias.** 17.047 mensagens do WildChat e 29 do Mosscap têm chave vazia.
 - **Português escasso.** Fora as fontes sintéticas, só há 25.990 mensagens de usuário em português, quase todas do WildChat, sem rótulo.
+
+## 4. Auditoria de rótulos
+
+Objetivo: verificar se os rótulos das fontes seguem a definição de ataque da especificação (seção 3.1) e estimar, em cada fonte, a proporção de ataques por família e de negativos difíceis. As estimativas alimentam o mapa de lacunas frente aos mínimos da seção 7.2 da especificação.
+
+### 4.1 Amostra
+
+Um estrato por valor de rótulo nas fontes rotuladas e um por fonte nas demais, com 20 textos por estrato na primeira fase:
+
+| Fonte | Estratos |
+|---|---|
+| ai-safety injeção | `0`, `1` |
+| ai-safety jailbreak | `0`, `1` |
+| TrustAIRLab | `False`, `True` |
+| LLMail | `True`, `Unclear`, `False`, `benigno` |
+| deepset | `0`, `1` |
+| Gandalf, Mosscap, NotInject, oasst2, WildChat | um estrato cada |
+
+São 17 estratos e 340 textos. Regras do sorteio:
+
+- semente `42`, sorteio uniforme dentro do estrato;
+- só textos válidos como entrada (seção 4.1 da especificação): chave não vazia e até 4.096 caracteres;
+- no máximo um texto por chave de comparação dentro da amostra;
+- no oasst2 e no WildChat, todas as mensagens do usuário, e não só a primeira (DD8).
+
+A anotação é **às cegas**: a planilha mostra só um identificador da amostra e o texto, com as fontes embaralhadas. A fonte, o `id_original` e o rótulo da fonte ficam num arquivo separado, consultado só depois da anotação. A anotação é feita por uma única pessoa (o autor do projeto), e a amostra servirá depois como referência para validar um anotador automático na construção do dataset.
+
+### 4.2 Guia de anotação
+
+Cada texto é lido como **uma mensagem de usuário enviada a um assistente de uma aplicação**, cujo operador definiu instruções, políticas e possivelmente segredos (por exemplo, uma senha num jogo como o Gandalf). O texto é anotado por inteiro, sem considerar a fonte de onde veio.
+
+| Campo | Valores | Regra |
+|---|---|---|
+| `classe` | `ataque`, `sem_ataque`, `incerto` | Definição da seção 3.1 da especificação: a intenção em relação às instruções do operador. `incerto` só quando o texto não permite decidir; explicar em `observacao`. |
+| `familia` | `indireta`, `ofuscacao`, `persona`, `vazamento`, `sobrescrita` | Só para `ataque`. Uma família, com a precedência `indireta` > `ofuscacao` > `persona` > `vazamento` > `sobrescrita`. |
+| `negativo_dificil` | `sim`, `nao` | Só para `sem_ataque`: `sim` quando o texto compartilha vocabulário ou forma com ataques. |
+| `idioma` | `pt`, `en`, `misto`, `outro` | `misto` quando português e inglês se combinam no mesmo texto; `outro` para os demais idiomas, que a especificação não prevê. |
+| `observacao` | texto livre | Dúvidas, casos de fronteira e o motivo de cada `incerto`. |
+
+Casos de fronteira, já decididos pela especificação:
+
+| Caso | Classe | Base |
+|---|---|---|
+| Pedido nocivo direto, sem manipulação ("como fabricar uma arma?") | `sem_ataque` (`negativo_dificil` = `nao`, salvo vocabulário de ataque) | D2 |
+| Persona ou cenário sem as regras do operador, mesmo com pedido inofensivo | `ataque` (`persona`) | D1; DD4 |
+| Role-play que não remove regras ("finja ser um chef e me sugira um prato") | `sem_ataque` (`negativo_dificil` = `sim`) | D1 |
+| Pedido do prompt do sistema, das regras ou de um segredo do operador | `ataque` (`vazamento`) | D5 |
+| Pergunta sobre o propósito do assistente ("qual é a sua função?") | `sem_ataque` (`negativo_dificil` = `sim`) | Seção 3.1 |
+| Alteração das próprias instruções do usuário ("ignore o último item do meu pedido") | `sem_ataque` (`negativo_dificil` = `sim`) | Seção 3.1 |
+| Conteúdo colado com instrução dirigida ao assistente para fugir das regras | `ataque` (`indireta`) | Seção 3.2 |
+| Conteúdo colado sem instrução ao assistente ("resuma este e-mail: ...") | `sem_ataque` | Seção 3.1 |
+| Pergunta ou texto sobre prompt injection, jailbreak ou segurança de IA | `sem_ataque` (`negativo_dificil` = `sim`) | Seção 3.1 |
+| Ataque codificado, com letras separadas ou pedido de tradução para contornar regras | `ataque` (`ofuscacao`) | Seção 3.2 |
+
+Casos novos que surgirem na anotação são registrados em `observacao` e, se mudarem a interpretação da definição, entram nesta tabela antes do cálculo dos resultados.
+
+### 4.3 Critério de decisão
+
+Fixado antes da anotação. O critério decide se o rótulo da fonte pode ser usado **no treino**, onde se tolera um erro de rótulo de até 20% com 95% de confiança. Para cada estrato de fonte rotulada, a **concordância** é a proporção de textos em que a classe anotada coincide com a classe implicada pelo rótulo da fonte, excluídos os `incerto`, que são reportados à parte. O `Unclear` do LLMail não implica classe; nele, mede-se só a proporção de ataques.
+
+| Resultado na primeira fase (20 textos) | Decisão |
+|---|---|
+| Concordância de pelo menos 19 em 20 | Rótulo da fonte aceito no estrato. |
+| Concordância de 15 em 20 ou menos | Rótulo da fonte rejeitado; o estrato só entra com anotação própria. |
+| Entre os dois, ou 3 ou mais `incerto` | Segunda fase: mais 30 textos (total de 50). O rótulo é aceito se o limite inferior do intervalo de Wilson de 95% for de pelo menos 80% (46 em 50 ou mais) e rejeitado caso contrário. |
+
+O limite de 80% é a afirmação mais forte que 50 textos sustentam sem exigir um placar quase perfeito: mesmo 50 em 50 dão um limite inferior de 92,9%. Nas fontes sem rótulo, a primeira fase estima a proporção de ataques e a distribuição de famílias, e a segunda fase é usada quando a estimativa não bastar para o mapa de lacunas.
+
+**Validação e teste exigem mais.** Um erro de rótulo tolerável no treino não é aceitável na avaliação: 5% de ataques entre os negativos do teste somariam até 5 pontos ao FPR medido, frente a um limite de 2% (D12). Certificar um erro abaixo de 2% exigiria cerca de 200 textos sem erro por estrato (Wilson de 0 em 200: até 1,9%). Por isso, os rótulos de validação e teste não vêm do rótulo da fonte: todos os exemplos dessas partições serão revisados, com o método definido na construção do dataset.
