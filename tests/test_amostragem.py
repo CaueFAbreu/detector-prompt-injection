@@ -1,7 +1,7 @@
 import pandas as pd
 
 from src import leitura
-from src.amostragem import estrato, nota, selecionar
+from src.amostragem import COLUNAS_ANOTACAO, estrato, montar_fase1, nota, selecionar
 from src.auditoria import chave_comparacao
 
 FONTE = "autor/fonte"
@@ -92,3 +92,55 @@ def test_estrato_menor_que_o_tamanho_devolve_todas_as_linhas():
     assert sorted(_ids(amostra)) == ["id0", "id1", "id2"]
     notas = [linha["nota"] for linha in amostra[FONTE]]
     assert notas == sorted(notas)
+
+
+def _amostra_sintetica(estratos=("a/x:0", "a/x:1", "b/y"), por_estrato=5):
+    return {
+        nome: [
+            {
+                "fonte": nome.split(":")[0],
+                "id_original": f"{nome}-{i}",
+                "rotulo_fonte": nome.split(":")[1] if ":" in nome else None,
+                "texto": f"texto {nome} {i}",
+                "nota": f"{i:064x}",
+            }
+            for i in range(por_estrato)
+        ]
+        for nome in estratos
+    }
+
+
+def test_planilha_da_fase1_nao_revela_fonte_nem_rotulo():
+    planilha, _ = montar_fase1(_amostra_sintetica())
+
+    assert list(planilha.columns) == ["id_amostra", "texto", *COLUNAS_ANOTACAO]
+    assert (planilha[COLUNAS_ANOTACAO] == "").all().all()
+
+
+def test_fase1_usa_as_primeiras_posicoes_de_cada_estrato():
+    _, chave = montar_fase1(_amostra_sintetica(), tamanho=3)
+
+    assert chave.groupby("estrato").size().to_dict() == {"a/x:0": 3, "a/x:1": 3, "b/y": 3}
+    assert sorted(chave["posicao_na_fila"].unique()) == [1, 2, 3]
+    primeiras = {f"{nome}-{i}" for nome in ("a/x:0", "a/x:1", "b/y") for i in range(3)}
+    assert set(chave["id_original"]) == primeiras
+
+
+def test_planilha_e_chave_se_correspondem_pelo_id_amostra():
+    amostra = _amostra_sintetica()
+    planilha, chave = montar_fase1(amostra)
+    texto_por_id = {
+        linha["id_original"]: linha["texto"] for linhas in amostra.values() for linha in linhas
+    }
+
+    assert list(planilha["id_amostra"]) == [f"A{i:04d}" for i in range(1, 16)]
+    assert list(chave["id_amostra"]) == list(planilha["id_amostra"])
+    assert list(planilha["texto"]) == [texto_por_id[i] for i in chave["id_original"]]
+
+
+def test_fase1_embaralha_as_fontes_de_forma_deterministica():
+    planilha, chave = montar_fase1(_amostra_sintetica())
+    repetida, _ = montar_fase1(_amostra_sintetica())
+
+    assert planilha.equals(repetida)
+    assert list(chave["estrato"]) != sorted(chave["estrato"])
