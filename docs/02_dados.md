@@ -125,7 +125,9 @@ diff docs/manifesto_dados.json data/raw/manifesto.json
 | `leolee99/NotInject` | 7 | 0,1 | `847ae76cf8fe` |
 | `OpenAssistant/oasst2` | 3 | 66,7 | `179dd21fc551` |
 | `allenai/WildChat-1M` | 16 | 3.360,9 | `7d6490e46228` |
-| **Total** | **69** | **3.586,2** | |
+| **Total** | **69** | **3.586,0** | |
+
+Tamanhos em MB decimais (10⁶ bytes). O total é a soma dos bytes do manifesto, e não a dos valores arredondados por fonte.
 
 Escolhas de arquivos:
 
@@ -148,7 +150,9 @@ Medidas de `src/auditoria.py` sobre os arquivos do manifesto, gravadas em [`repo
 | DD7 | No LLMail, o texto é o envio completo (`Subject of the email: … Body: …`) e o rótulo é `attack_attempt` convertido em texto; os 203 e-mails de teste de falso positivo entram com rótulo `benigno` | Extrair só o corpo do e-mail | Fiel à fonte; a forma de apresentar um e-mail colado é decidida na construção do dataset. A conversão unifica `True` gravado como texto e como booleano. |
 | DD8 | No oasst2 e no WildChat, todas as mensagens do usuário, com a posição na conversa e o idioma da própria mensagem; mensagens `deleted` do oasst2 entram marcadas | Só a primeira mensagem, ou filtrar já na leitura | A escolha das mensagens é da construção do dataset; a auditoria mede as duas opções. |
 | DD9 | No Mosscap, só `prompt` e `level` | Ler também as respostas | As respostas são do modelo, não do usuário, e podem conter as senhas do jogo. |
-| DD10 | No WildChat, `id_original` é `arquivo:linha:posição`, e `grupo_fonte` é o `conversation_hash` | Usar o hash como identificador | O hash é calculado sobre o conteúdo: 11.670 conversas repetem o hash de outra, todas com as mesmas mensagens do usuário (um mesmo texto aparece 1.368 vezes). Como grupo, ele mantém conversas idênticas na mesma partição. |
+| DD10 | No WildChat, `id_original` é `arquivo:linha:posição`, e `grupo_fonte` é o `conversation_hash` | Usar o hash como identificador | O hash é calculado sobre o conteúdo: 11.670 conversas repetem o hash de outra, todas com as mesmas mensagens do usuário (o maior grupo com o mesmo hash tem 1.368 conversas). Como grupo, ele mantém conversas idênticas na mesma partição. |
+
+Os números das DD5, DD6 e DD10 vêm de medições avulsas, feitas com scripts fora do repositório sobre as revisões do manifesto e conferidas em 11/11/2026. Eles justificam escolhas de leitura e não fazem parte de `reports/auditoria_fontes.json`.
 
 ### 3.2 Medidas por fonte
 

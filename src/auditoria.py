@@ -88,6 +88,8 @@ class AuditoriaFonte:
                 self.rotulos_por_chave[resumo].add(rotulo)
 
     def resumo(self) -> dict:
+        if self.linhas == 0:
+            raise ValueError("fonte sem linhas para auditar")
         comprimentos = np.concatenate(self.comprimentos)
         p50, p95 = np.percentile(comprimentos, [50, 95], method="nearest")
         return {

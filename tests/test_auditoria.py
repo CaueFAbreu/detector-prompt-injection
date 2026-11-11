@@ -117,6 +117,13 @@ def test_auditoria_conta_mesma_chave_com_rotulos_divergentes():
     assert resumo["contagens"]["rotulo_fonte"] == {"0": 3, "(ausente)": 1, "1": 1}
 
 
+def test_auditoria_de_fonte_sem_linhas_levanta_erro_claro():
+    fonte = AuditoriaFonte()
+
+    with pytest.raises(ValueError, match="fonte sem linhas para auditar"):
+        fonte.resumo()
+
+
 def test_auditar_resume_cada_fonte_e_a_sobreposicao(monkeypatch, tmp_path):
     tabelas = {"a/um": _tabela(["Oi", "tchau"]), "b/dois": _tabela(["oi", "outro"])}
     monkeypatch.setattr(

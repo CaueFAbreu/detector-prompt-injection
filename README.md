@@ -8,7 +8,7 @@ Detector de prompt injection e jailbreak para mensagens em português, pensado c
 
 ## Stack
 
-Python · Hugging Face Hub · pandas · Matplotlib · pytest · Ruff · GitHub Actions
+Python · Hugging Face Hub · pandas · pyarrow · Matplotlib · pytest · Ruff · GitHub Actions
 
 ## Instalação
 
