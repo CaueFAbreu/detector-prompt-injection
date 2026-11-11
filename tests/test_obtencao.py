@@ -119,3 +119,4 @@ def test_gravar_manifesto_preserva_entradas(tmp_path):
     obtencao.gravar_manifesto(entradas, caminho)
 
     assert json.loads(caminho.read_text(encoding="utf-8")) == entradas
+    assert b"\r\n" not in caminho.read_bytes()

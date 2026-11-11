@@ -82,7 +82,7 @@ def baixar_fonte(fonte: Fonte, destino: Path) -> list[dict]:
 
 def gravar_manifesto(entradas: list[dict], caminho: Path) -> None:
     texto = json.dumps(entradas, ensure_ascii=False, indent=2)
-    caminho.write_text(texto + "\n", encoding="utf-8")
+    caminho.write_text(texto + "\n", encoding="utf-8", newline="\n")
 
 
 def main() -> None:

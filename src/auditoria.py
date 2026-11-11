@@ -134,7 +134,8 @@ def auditar(fontes: tuple[Fonte, ...] = FONTES, destino: Path = DESTINO) -> dict
 def main() -> None:
     resultado = auditar()
     SAIDA.parent.mkdir(exist_ok=True)
-    SAIDA.write_text(json.dumps(resultado, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    texto = json.dumps(resultado, ensure_ascii=False, indent=2)
+    SAIDA.write_text(texto + "\n", encoding="utf-8", newline="\n")
     print(f"Auditoria gravada em {SAIDA}")
 
 
