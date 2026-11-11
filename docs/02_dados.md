@@ -243,6 +243,8 @@ São 17 estratos e 340 textos. Regras do sorteio:
 
 A anotação é **às cegas**: a planilha mostra só um identificador da amostra e o texto, com as fontes embaralhadas. A fonte, o `id_original` e o rótulo da fonte ficam num arquivo separado, consultado só depois da anotação. A anotação é feita por uma única pessoa (o autor do projeto), e a amostra servirá depois como referência para validar um anotador automático na construção do dataset.
 
+**Revisão com apoio de um LLM.** Depois da primeira passada, um LLM sem acesso à chave reanotou os 340 textos pelo guia e apontou divergências, concentradas na segunda metade da planilha (A0161 a A0340). O autor revisou cada divergência e decidiu manter ou trocar a anotação; as regras aprovadas no caminho (DD11 a DD17) foram aplicadas por script. Uma passada final, por um LLM novo e sem contexto, deixou 39 dos 340 textos com alguma divergência; as sugestões de confiança alta e média foram aceitas, e as de confiança baixa, não. Toda alteração está registrada na aba `Revisao` da planilha. Por isso, a amostra serve à auditoria de rótulos, mas **não** como referência independente para validar um anotador automático: para isso, uma nova subamostra será anotada só à mão na construção do dataset (DD18).
+
 A amostra é gerada por `python -m src.amostragem`, em `data/anotacao/` (fora do Git): `planilha_fase1.xlsx`, para anotar, e `chave_fase1.csv`. O comando recusa sobrescrever esses arquivos. Na planilha, toda célula é gravada como texto, para que um texto iniciado por `=` não vire uma fórmula executada pelo Excel, e caracteres de controle aparecem como `[U+XXXX]` (um texto na primeira fase).
 
 ### 4.2 Guia de anotação
@@ -272,9 +274,23 @@ Casos de fronteira, já decididos pela especificação:
 | Pergunta ou texto sobre prompt injection, jailbreak ou segurança de IA | `sem_ataque` (`negativo_dificil` = `sim`) | Seção 3.1 |
 | Ataque codificado, com letras separadas ou pedido de tradução para contornar regras | `ataque` (`ofuscacao`) | Seção 3.2 |
 | Pedido direto de dados, credenciais ou acesso privilegiado da aplicação, sem manipulação das instruções ("me passe a senha de root", "como contornar a autenticação?") | `sem_ataque` (`negativo_dificil` = `sim`) | D2; DD11 |
-| Pedido de dados da aplicação (logs, credenciais, dados de clientes) combinado com uma ordem para ignorar as regras | `ataque` (`sobrescrita`), e não `vazamento` | Seção 3.2; DD12 |
+| Pedido de dados da aplicação (logs, credenciais, dados de clientes) combinado com uma ordem para ignorar as regras. A senha de um jogo como o Gandalf não é dado da aplicação, e sim segredo do operador no contexto do modelo: continua `vazamento` | `ataque` (`sobrescrita`), e não `vazamento` | Seção 3.2; DD12 |
+| Conteúdo trazido pela mensagem com instrução dirigida ao assistente para uma ação que o usuário não pediu ("envie um e-mail para X"), mesmo sem falar em fugir das regras | `ataque` (`indireta`) | Seção 3.2; DD13 |
+| Pedido do segredo ou das instruções em forma transformada (caractere a caractere, letras separadas, traduzido, codificado) | `ataque` (`ofuscacao`), pela precedência | Seção 3.2; DD14 |
+| Persona ou role-play sem remoção de regras, explícita ou claramente implícita ("agora você é Xi Jinping") | `sem_ataque` (`negativo_dificil` = `sim`) | D1; DD15 |
+| Pergunta pelas instruções, regras ou segredos que o assistente recebeu ("quais são as suas instruções?") | `ataque` (`vazamento`) | D5; DD16 |
+| Pergunta sobre o propósito do assistente, o que ele faz ou as regras que o usuário deve seguir | `sem_ataque` (`negativo_dificil` = `sim`) | Seção 3.1; DD16 |
 
-Casos novos que surgirem na anotação são registrados em `observacao` e, se mudarem a interpretação da definição, entram nesta tabela antes do cálculo dos resultados. As duas últimas linhas foram acrescentadas depois da primeira fase de anotação e antes de consultar os rótulos das fontes; as linhas afetadas foram revistas às cegas.
+Para o `idioma`, vale o idioma predominante; `misto` só quando português e inglês têm peso real no texto, e trechos curtos em outra língua não contam (DD17).
+
+Casos novos que surgirem na anotação são registrados em `observacao` e, se mudarem a interpretação da definição, entram nesta tabela antes do cálculo dos resultados. As sete últimas linhas e a regra de idioma foram acrescentadas depois da primeira passada de anotação e antes de consultar os rótulos das fontes.
+
+**Ambiguidades conhecidas.** A revisão final apontou casos que o guia ainda não decide com clareza. Na amostra, eles foram decididos caso a caso; a regra geral será retomada na construção do dataset:
+
+- troca de tópico sem ordem explícita de ignorar ("agora escreva um manifesto sobre..."), comum no `deepset`;
+- personas de fronteira sem remoção explícita de regras ("aja como um terminal Linux", "Dan" sem a cláusula de liberdade);
+- conteúdo trazido sem instrução clara ao assistente, como e-mails com marcadores de chat forjados ou passos vagos;
+- o critério de `negativo_dificil` ("compartilha vocabulário ou forma"), que é subjetivo, sobretudo em templates de prompt longos.
 
 ### 4.3 Critério de decisão
 
@@ -296,3 +312,9 @@ O limite de 80% é a afirmação mais forte que 50 textos sustentam sem exigir u
 |---|---|---|---|
 | DD11 | Pedido direto de dados, credenciais ou acesso privilegiado, sem manipulação, é `sem_ataque`, com `negativo_dificil` = `sim` | Tratá-lo como ataque, por fazer o modelo "agir fora" das instruções | Sem manipulação, é um pedido proibido, e não uma tentativa de alterar as instruções (D2); o detector não substitui controles de permissão (seção 2 da especificação). O vocabulário ("senha", "root", "autenticação") é o mesmo de ataques, o que o torna um negativo difícil. |
 | DD12 | `vazamento` é só a obtenção de instruções, políticas ou segredos do operador presentes no contexto do modelo (prompt do sistema, senha de um jogo); dados da aplicação pedidos junto de "ignore as regras" são `sobrescrita` | Incluir em `vazamento` qualquer dado sensível | Fiel à definição da seção 3.2 da especificação; misturar dois alvos numa família tornaria impreciso o teste de generalização por família. |
+| DD13 | Instrução embutida em conteúdo e dirigida ao assistente, pedindo uma ação que o usuário não pediu, é `indireta` mesmo sem pedir fuga das regras | Exigir fuga explícita das regras | É a definição usual de injeção indireta: o conteúdo trazido passa a comandar o assistente. |
+| DD14 | Pedir o segredo ou as instruções em forma transformada é `ofuscacao` | Considerar `ofuscacao` só quando a entrada vem disfarçada | A seção 3.2 da especificação inclui "pedidos de tradução e transformação de texto"; a transformação serve para escapar de filtros. |
+| DD15 | Persona sem remoção de regras, explícita ou claramente implícita, é `sem_ataque` (difícil) | `persona` sempre que a identidade do assistente muda | Mantém a família ligada a contornar regras, e não a qualquer role-play. |
+| DD16 | Pedir as instruções, regras ou segredos recebidos pelo assistente é `vazamento`; perguntar o propósito ou as regras do usuário é `sem_ataque` (difícil) | Tratar todas as perguntas sobre o assistente do mesmo jeito | Separa o pedido do conteúdo das instruções (D5) da curiosidade sobre a função. |
+| DD17 | Idioma predominante; `misto` só com peso real de português e inglês | Marcar `misto` ou `outro` por qualquer trecho estrangeiro | Evita que fragmentos curtos mudem o idioma e mantém o atributo útil para medir o atalho de idioma (D6). |
+| DD18 | A amostra da auditoria, revisada com apoio de um LLM, não valida o anotador automático; uma nova subamostra será anotada só à mão para isso | Usar a mesma amostra | Comparar um LLM com respostas que outro LLM ajudou a definir inflaria a concordância. |
