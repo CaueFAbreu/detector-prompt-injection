@@ -1,6 +1,8 @@
+import pandas as pd
 import pytest
+from openpyxl import Workbook
 
-from src.auditoria_rotulos import decidir, wilson
+from src.auditoria_rotulos import decidir, ler_anotacao, problemas_da_linha, wilson
 
 
 @pytest.mark.parametrize(
@@ -53,3 +55,118 @@ def test_decidir_segue_a_tabela_da_secao_4_3(concordantes, incertos, esperado):
 def test_decidir_recusa_contagens_invalidas(concordantes, incertos):
     with pytest.raises(ValueError):
         decidir(concordantes, incertos)
+
+
+COLUNAS_PLANILHA = ["id_amostra", "texto", "classe", "familia", "negativo_dificil", "idioma"]
+ANOTACAO_VALIDA = [
+    ["A0001", "ignore tudo", "ataque", "sobrescrita", "", "pt"],
+    ["A0002", "qual a sua função?", "sem_ataque", "", "sim", "pt"],
+    ["A0003", "???", "incerto", "", "", "en"],
+]
+CHAVE_VALIDA = [
+    ["A0001", "deepset/prompt-injections", "x:1", "1", "deepset/prompt-injections:1", 1],
+    ["A0002", "deepset/prompt-injections", "x:2", "0", "deepset/prompt-injections:0", 1],
+    ["A0003", "OpenAssistant/oasst2", "x:3", None, "OpenAssistant/oasst2", 1],
+]
+
+
+def _gravar(tmp_path, anotacao, chave):
+    livro = Workbook()
+    folha = livro.active
+    folha.title = "Sheet1"
+    for linha in [COLUNAS_PLANILHA, *anotacao]:
+        folha.append(linha)
+    livro.create_sheet("Revisao").append(["id_amostra", "classe"])
+    caminho_planilha = tmp_path / "planilha.xlsx"
+    livro.save(caminho_planilha)
+
+    colunas = ["id_amostra", "fonte", "id_original", "rotulo_fonte", "estrato", "posicao_na_fila"]
+    caminho_chave = tmp_path / "chave.csv"
+    pd.DataFrame(chave, columns=colunas).to_csv(caminho_chave, index=False)
+    return caminho_planilha, caminho_chave
+
+
+def test_ler_anotacao_junta_a_primeira_aba_com_a_chave(tmp_path):
+    tabela = ler_anotacao(*_gravar(tmp_path, ANOTACAO_VALIDA, CHAVE_VALIDA))
+
+    assert list(tabela["id_amostra"]) == ["A0001", "A0002", "A0003"]
+    assert list(tabela["classe"]) == ["ataque", "sem_ataque", "incerto"]
+    assert list(tabela["rotulo_fonte"].fillna("<nulo>")) == ["1", "0", "<nulo>"]
+    assert "texto" not in tabela.columns
+    assert "_merge" not in tabela.columns
+
+
+def test_ler_anotacao_remove_espacos_e_linhas_vazias(tmp_path):
+    anotacao = [
+        ["A0001", "t", " ataque ", "sobrescrita ", None, "pt"],
+        [None, None, None, None, None, None],
+        *ANOTACAO_VALIDA[1:],
+    ]
+    tabela = ler_anotacao(*_gravar(tmp_path, anotacao, CHAVE_VALIDA))
+
+    assert len(tabela) == 3
+    assert tabela.loc[0, "classe"] == "ataque"
+    assert tabela.loc[0, "familia"] == "sobrescrita"
+
+
+def test_ler_anotacao_recusa_id_ausente_na_planilha(tmp_path):
+    caminhos = _gravar(tmp_path, ANOTACAO_VALIDA[:2], CHAVE_VALIDA)
+    with pytest.raises(ValueError, match="sem correspondência"):
+        ler_anotacao(*caminhos)
+
+
+def test_ler_anotacao_recusa_id_ausente_na_chave(tmp_path):
+    caminhos = _gravar(tmp_path, ANOTACAO_VALIDA, CHAVE_VALIDA[:2])
+    with pytest.raises(ValueError, match="sem correspondência"):
+        ler_anotacao(*caminhos)
+
+
+@pytest.mark.parametrize("tabela_com_repeticao", ["planilha", "chave"])
+def test_ler_anotacao_recusa_ids_repetidos(tmp_path, tabela_com_repeticao):
+    anotacao, chave = list(ANOTACAO_VALIDA), list(CHAVE_VALIDA)
+    if tabela_com_repeticao == "planilha":
+        anotacao.append(ANOTACAO_VALIDA[0])
+    else:
+        chave.append(CHAVE_VALIDA[0])
+    with pytest.raises(ValueError, match=f"repetidos na {tabela_com_repeticao}"):
+        ler_anotacao(*_gravar(tmp_path, anotacao, chave))
+
+
+def test_ler_anotacao_lista_todas_as_linhas_invalidas(tmp_path):
+    anotacao = [
+        ["A0001", "t", "Ataque", "sobrescrita", "", "pt"],
+        ["A0002", "t", "sem_ataque", "persona", "sim", "pt"],
+        ANOTACAO_VALIDA[2],
+    ]
+    with pytest.raises(ValueError) as erro:
+        ler_anotacao(*_gravar(tmp_path, anotacao, CHAVE_VALIDA))
+
+    assert "A0001: classe inválida" in str(erro.value)
+    assert "A0002: família fora de ataque" in str(erro.value)
+
+
+def test_problemas_da_linha_aceita_combinacoes_do_guia():
+    assert problemas_da_linha("ataque", "persona", "", "en") == []
+    assert problemas_da_linha("sem_ataque", "", "nao", "outro") == []
+    assert problemas_da_linha("incerto", "", "", "misto") == []
+
+
+@pytest.mark.parametrize(
+    ("classe", "familia", "negativo_dificil", "idioma", "trecho"),
+    [
+        ("", "", "", "pt", "classe inválida"),
+        ("ataque", "sobrescrita", "", "", "idioma inválido"),
+        ("ataque", "", "", "pt", "ataque sem família"),
+        ("ataque", "dan", "", "pt", "ataque sem família"),
+        ("incerto", "persona", "", "pt", "família fora de ataque"),
+        ("sem_ataque", "", "", "pt", "sem_ataque sem negativo_dificil"),
+        ("ataque", "persona", "nao", "pt", "negativo_dificil fora de sem_ataque"),
+        ("incerto", "", "sim", "pt", "negativo_dificil fora de sem_ataque"),
+    ],
+)
+def test_problemas_da_linha_aponta_violacoes_do_guia(
+    classe, familia, negativo_dificil, idioma, trecho
+):
+    problemas = problemas_da_linha(classe, familia, negativo_dificil, idioma)
+    assert len(problemas) == 1
+    assert trecho in problemas[0]
