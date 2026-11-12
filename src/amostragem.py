@@ -1,3 +1,4 @@
+import argparse
 import hashlib
 import random
 from collections.abc import Iterable, Iterator
@@ -18,6 +19,12 @@ SEMENTE = "42"
 TAMANHO_ESTRATO = 50
 TAMANHO_FASE1 = 20
 LIMITE_ACUMULADO = 1000
+# O `False` entra só para a anotação continuar às cegas; a decisão dele foi tomada na fase 1.
+ESTRATOS_FASE2 = (
+    "TrustAIRLab/in-the-wild-jailbreak-prompts:False",
+    "TrustAIRLab/in-the-wild-jailbreak-prompts:True",
+)
+PRIMEIRO_NUMERO_FASE2 = 341
 COLUNAS_ANOTACAO = ["classe", "familia", "negativo_dificil", "idioma", "observacao"]
 VALORES_ANOTACAO = {
     "classe": ["ataque", "sem_ataque", "incerto"],
@@ -82,16 +89,24 @@ def selecionar(
     return {nome: list(_menores(linhas, tamanho).values()) for nome, linhas in candidatos.items()}
 
 
-def montar_fase1(
-    amostra: dict[str, list[dict]], tamanho: int = TAMANHO_FASE1
+def montar_fase(
+    amostra: dict[str, list[dict]],
+    estratos: Iterable[str],
+    posicoes: range,
+    primeiro_numero: int,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
+    faltando = sorted(set(estratos) - set(amostra))
+    if faltando:
+        raise ValueError(f"estratos ausentes da amostra: {faltando}")
+
     linhas = [
         {**linha, "estrato": nome, "posicao_na_fila": posicao}
-        for nome in sorted(amostra)
-        for posicao, linha in enumerate(amostra[nome][:tamanho], start=1)
+        for nome in sorted(estratos)
+        for posicao, linha in enumerate(amostra[nome], start=1)
+        if posicao in posicoes
     ]
     random.Random(int(SEMENTE)).shuffle(linhas)
-    ids = [f"A{i:04d}" for i in range(1, len(linhas) + 1)]
+    ids = [f"A{i:04d}" for i in range(primeiro_numero, primeiro_numero + len(linhas))]
 
     planilha = pd.DataFrame({"id_amostra": ids, "texto": [linha["texto"] for linha in linhas]})
     for coluna in COLUNAS_ANOTACAO:
@@ -101,6 +116,17 @@ def montar_fase1(
     chave = pd.DataFrame(linhas, columns=colunas_chave)
     chave.insert(0, "id_amostra", ids)
     return planilha, chave
+
+
+def montar_fase1(
+    amostra: dict[str, list[dict]], tamanho: int = TAMANHO_FASE1
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    return montar_fase(amostra, amostra, range(1, tamanho + 1), primeiro_numero=1)
+
+
+def montar_fase2(amostra: dict[str, list[dict]]) -> tuple[pd.DataFrame, pd.DataFrame]:
+    posicoes = range(TAMANHO_FASE1 + 1, TAMANHO_ESTRATO + 1)
+    return montar_fase(amostra, ESTRATOS_FASE2, posicoes, PRIMEIRO_NUMERO_FASE2)
 
 
 def tornar_seguro(texto: str) -> str:
@@ -140,20 +166,29 @@ def gravar_planilha(planilha: pd.DataFrame, caminho: Path) -> None:
     livro.save(caminho)
 
 
-def _ler_todas() -> Iterator[pd.DataFrame]:
+def _ler(repositorios: set[str] | None = None) -> Iterator[pd.DataFrame]:
     for fonte in FONTES:
-        print(f"Lendo {fonte.repositorio}")
-        yield from ler_fonte(fonte)
+        if repositorios is None or fonte.repositorio in repositorios:
+            print(f"Lendo {fonte.repositorio}")
+            yield from ler_fonte(fonte)
 
 
-def main() -> None:
-    caminho_planilha = PASTA_ANOTACAO / "planilha_fase1.xlsx"
-    caminho_chave = PASTA_ANOTACAO / "chave_fase1.csv"
+def main(argumentos: list[str] | None = None) -> None:
+    analisador = argparse.ArgumentParser(description="Gera a planilha de anotação às cegas.")
+    analisador.add_argument("--fase", type=int, choices=[1, 2], default=1)
+    fase = analisador.parse_args(argumentos).fase
+
+    caminho_planilha = PASTA_ANOTACAO / f"planilha_fase{fase}.xlsx"
+    caminho_chave = PASTA_ANOTACAO / f"chave_fase{fase}.csv"
     for caminho in (caminho_planilha, caminho_chave):
         if caminho.exists():
             raise FileExistsError(f"{caminho} já existe; apague-o à mão para gerar de novo")
 
-    planilha, chave = montar_fase1(selecionar(_ler_todas()))
+    if fase == 1:
+        planilha, chave = montar_fase1(selecionar(_ler()))
+    else:
+        repositorios = {nome.rsplit(":", 1)[0] for nome in ESTRATOS_FASE2}
+        planilha, chave = montar_fase2(selecionar(_ler(repositorios)))
     gravar_planilha(planilha, caminho_planilha)
     chave.to_csv(caminho_chave, index=False, mode="x", encoding="utf-8", lineterminator="\n")
     print(chave.groupby("estrato").size().to_string())

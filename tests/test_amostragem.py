@@ -2,12 +2,15 @@ import pandas as pd
 import pytest
 from openpyxl import load_workbook
 
-from src import leitura
+from src import amostragem, leitura
 from src.amostragem import (
     COLUNAS_ANOTACAO,
+    ESTRATOS_FASE2,
     estrato,
     gravar_planilha,
+    montar_fase,
     montar_fase1,
+    montar_fase2,
     nota,
     selecionar,
     tornar_seguro,
@@ -15,6 +18,7 @@ from src.amostragem import (
 from src.auditoria import chave_comparacao
 
 FONTE = "autor/fonte"
+TRUSTAIRLAB = "TrustAIRLab/in-the-wild-jailbreak-prompts"
 
 
 def _tabela(textos, rotulos=None, ids=None, fonte=FONTE):
@@ -216,3 +220,95 @@ def test_gravar_planilha_nao_sobrescreve_arquivo_existente(tmp_path):
         gravar_planilha(_planilha(["a"]), caminho)
 
     assert caminho.read_bytes() == b"anotacoes"
+
+
+def test_fase2_usa_as_posicoes_21_a_50_dos_estratos_da_fase2():
+    amostra = _amostra_sintetica((*ESTRATOS_FASE2, "b/y"), por_estrato=50)
+    planilha, chave = montar_fase2(amostra)
+
+    assert chave.groupby("estrato").size().to_dict() == {nome: 30 for nome in ESTRATOS_FASE2}
+    assert sorted(chave["posicao_na_fila"].unique()) == list(range(21, 51))
+    assert list(planilha["id_amostra"]) == [f"A{i:04d}" for i in range(341, 401)]
+    assert list(planilha.columns) == ["id_amostra", "texto", *COLUNAS_ANOTACAO]
+
+
+def test_fase2_mistura_os_rotulos_de_forma_deterministica():
+    amostra = _amostra_sintetica(ESTRATOS_FASE2, por_estrato=50)
+    planilha, chave = montar_fase2(amostra)
+    repetida, _ = montar_fase2(amostra)
+
+    assert planilha.equals(repetida)
+    assert list(chave["estrato"]) != sorted(chave["estrato"])
+
+
+def test_fase2_nao_repete_textos_da_fase1():
+    amostra = _amostra_sintetica(ESTRATOS_FASE2, por_estrato=50)
+    _, chave1 = montar_fase1(amostra)
+    _, chave2 = montar_fase2(amostra)
+
+    assert set(chave1["id_original"]).isdisjoint(chave2["id_original"])
+
+
+def test_montar_fase_recusa_estrato_ausente():
+    with pytest.raises(ValueError, match="ausentes"):
+        montar_fase(_amostra_sintetica(), ["a/x:0", "z/w"], range(1, 3), primeiro_numero=1)
+
+
+def _leitura_falsa(chamadas, tabela):
+    def ler(repositorios=None):
+        chamadas.append(repositorios)
+        yield tabela
+
+    return ler
+
+
+def test_main_fase2_le_so_o_trustairlab_e_grava_os_arquivos(tmp_path, monkeypatch):
+    chamadas = []
+    textos = [f"prompt numero {i}" for i in range(100)]
+    tabela = _tabela(textos, ["True"] * 50 + ["False"] * 50, fonte=TRUSTAIRLAB)
+    monkeypatch.setattr(amostragem, "_ler", _leitura_falsa(chamadas, tabela))
+    monkeypatch.setattr(amostragem, "PASTA_ANOTACAO", tmp_path)
+
+    amostragem.main(["--fase", "2"])
+
+    assert chamadas == [{TRUSTAIRLAB}]
+    chave = pd.read_csv(tmp_path / "chave_fase2.csv")
+    assert list(chave["id_amostra"]) == [f"A{i:04d}" for i in range(341, 401)]
+    assert (tmp_path / "planilha_fase2.xlsx").exists()
+    with pytest.raises(FileExistsError):
+        amostragem.main(["--fase", "2"])
+
+
+def test_main_sem_argumentos_gera_a_fase1_com_todas_as_fontes(tmp_path, monkeypatch):
+    chamadas = []
+    tabela = _tabela([f"mensagem {i}" for i in range(30)])
+    monkeypatch.setattr(amostragem, "_ler", _leitura_falsa(chamadas, tabela))
+    monkeypatch.setattr(amostragem, "PASTA_ANOTACAO", tmp_path)
+
+    amostragem.main([])
+
+    assert chamadas == [None]
+    assert len(pd.read_csv(tmp_path / "chave_fase1.csv")) == 20
+    assert not (tmp_path / "chave_fase2.csv").exists()
+
+
+def test_fase1_mantem_a_permutacao_que_gerou_a_amostra_real():
+    _, chave = montar_fase1(_amostra_sintetica())
+
+    # Ordem registrada antes da generalização para montar_fase; mudá-la tornaria a fase 1
+    # irreproduzível.
+    assert list(chave["id_original"]) == [
+        "a/x:1-3", "b/y-3", "a/x:1-2", "a/x:1-1", "b/y-4",
+        "b/y-2", "a/x:1-0", "a/x:0-2", "a/x:1-4", "a/x:0-3",
+        "a/x:0-4", "b/y-1", "a/x:0-0", "a/x:0-1", "b/y-0",
+    ]  # fmt: skip
+
+
+def test_ler_filtra_as_fontes_pelo_repositorio(monkeypatch, capsys):
+    monkeypatch.setattr(amostragem, "ler_fonte", lambda fonte: iter([fonte.repositorio]))
+    todas = [fonte.repositorio for fonte in amostragem.FONTES]
+
+    assert list(amostragem._ler()) == todas
+    assert list(amostragem._ler({TRUSTAIRLAB})) == [TRUSTAIRLAB]
+    assert list(amostragem._ler(set())) == []
+    capsys.readouterr()
