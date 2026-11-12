@@ -1,15 +1,30 @@
+import json
+from collections import Counter
 from math import sqrt
 from pathlib import Path
 
 import pandas as pd
 
-from src.amostragem import TAMANHO_FASE1, VALORES_ANOTACAO
+from src.amostragem import PASTA_ANOTACAO, TAMANHO_FASE1, VALORES_ANOTACAO
+from src.obtencao import calcular_sha256
 
 Z_95 = 1.959963984540054
 MINIMO_ACEITE = 19
 MAXIMO_REJEICAO = 15
 INCERTOS_FASE2 = 3
 COLUNAS_LIDAS = ["id_amostra", *VALORES_ANOTACAO]
+CLASSE_DO_ROTULO = {
+    "1": "ataque",
+    "True": "ataque",
+    "0": "sem_ataque",
+    "False": "sem_ataque",
+    "benigno": "sem_ataque",
+    "Unclear": None,
+}
+CASAS_DECIMAIS = 4
+PLANILHA = PASTA_ANOTACAO / "planilha_fase1.xlsx"
+CHAVE = PASTA_ANOTACAO / "chave_fase1.csv"
+SAIDA = Path("reports/auditoria_rotulos.json")
 
 
 def wilson(sucessos: int, total: int) -> tuple[float, float]:
@@ -92,3 +107,97 @@ def ler_anotacao(caminho_planilha: Path, caminho_chave: Path) -> pd.DataFrame:
     if problemas:
         raise ValueError("anotação inválida:\n" + "\n".join(problemas))
     return juncao.drop(columns="_merge")
+
+
+def classe_da_fonte(rotulo: str | None) -> str | None:
+    if pd.isna(rotulo):
+        return None
+    if rotulo not in CLASSE_DO_ROTULO:
+        raise ValueError(f"rótulo de fonte desconhecido: {rotulo!r}")
+    return CLASSE_DO_ROTULO[rotulo]
+
+
+def proporcao(sucessos: int, total: int) -> dict:
+    if total == 0:
+        return {"n": 0, "de": 0, "proporcao": None, "wilson": None}
+    inferior, superior = wilson(sucessos, total)
+    return {
+        "n": sucessos,
+        "de": total,
+        "proporcao": round(sucessos / total, CASAS_DECIMAIS),
+        "wilson": [round(inferior, CASAS_DECIMAIS), round(superior, CASAS_DECIMAIS)],
+    }
+
+
+def _contar(valores: pd.Series) -> dict[str, int]:
+    contagem = Counter(valores)
+    return dict(sorted(contagem.items(), key=lambda item: (-item[1], item[0])))
+
+
+def resumir_estrato(linhas: pd.DataFrame) -> dict:
+    if linhas["fonte"].nunique() != 1 or linhas["rotulo_fonte"].nunique(dropna=False) != 1:
+        raise ValueError("um estrato precisa ter uma única fonte e um único rótulo")
+
+    rotulo = linhas["rotulo_fonte"].iloc[0]
+    classe_fonte = classe_da_fonte(rotulo)
+    avaliadas = linhas[linhas["classe"] != "incerto"]
+    incertos = len(linhas) - len(avaliadas)
+    ataques = avaliadas[avaliadas["classe"] == "ataque"]
+
+    concordancia = None
+    if classe_fonte is not None:
+        concordantes = int((avaliadas["classe"] == classe_fonte).sum())
+        concordancia = {
+            **proporcao(concordantes, len(avaliadas)),
+            "decisao": decidir(concordantes, incertos),
+        }
+
+    return {
+        "fonte": linhas["fonte"].iloc[0],
+        "rotulo_fonte": None if pd.isna(rotulo) else rotulo,
+        "classe_fonte": classe_fonte,
+        "textos": len(linhas),
+        "incertos": incertos,
+        "ataques": proporcao(len(ataques), len(avaliadas)),
+        "concordancia": concordancia,
+        "familias": _contar(ataques["familia"]),
+        "negativos_dificeis": int((avaliadas["negativo_dificil"] == "sim").sum()),
+        "idiomas": _contar(linhas["idioma"]),
+    }
+
+
+def resumir(tabela: pd.DataFrame) -> dict[str, dict]:
+    return {nome: resumir_estrato(linhas) for nome, linhas in tabela.groupby("estrato")}
+
+
+def _linha_do_terminal(nome: str, resumo: dict) -> str:
+    ataques = resumo["ataques"]
+    texto = f"{nome:<50} ataques {ataques['n']:>2}/{ataques['de']:<2}"
+    concordancia = resumo["concordancia"]
+    if concordancia is not None:
+        texto += (
+            f"  concordância {concordancia['n']:>2}/{concordancia['de']:<2}"
+            f" {concordancia['decisao']}"
+        )
+    return texto
+
+
+def main() -> None:
+    estratos = resumir(ler_anotacao(PLANILHA, CHAVE))
+    relatorio = {
+        "entradas": {
+            "planilha": {"arquivo": PLANILHA.name, "sha256": calcular_sha256(PLANILHA)},
+            "chave": {"arquivo": CHAVE.name, "sha256": calcular_sha256(CHAVE)},
+        },
+        "estratos": estratos,
+    }
+    SAIDA.parent.mkdir(parents=True, exist_ok=True)
+    texto = json.dumps(relatorio, ensure_ascii=False, indent=2)
+    SAIDA.write_text(texto + "\n", encoding="utf-8", newline="\n")
+    for nome, resumo in estratos.items():
+        print(_linha_do_terminal(nome, resumo))
+    print(f"Relatório em {SAIDA}")
+
+
+if __name__ == "__main__":
+    main()

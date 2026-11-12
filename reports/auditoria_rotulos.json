@@ -1,0 +1,521 @@
+{
+  "entradas": {
+    "planilha": {
+      "arquivo": "planilha_fase1.xlsx",
+      "sha256": "bb0a9e85e3379e98f45756c4156fc149dfc69900d7b32e1d138e17b1298f31f5"
+    },
+    "chave": {
+      "arquivo": "chave_fase1.csv",
+      "sha256": "6e9c011a015371c12fccb1e718d939d95c059b5c927acf2b44d6b2f941779aa4"
+    }
+  },
+  "estratos": {
+    "Lakera/gandalf_ignore_instructions": {
+      "fonte": "Lakera/gandalf_ignore_instructions",
+      "rotulo_fonte": null,
+      "classe_fonte": null,
+      "textos": 20,
+      "incertos": 0,
+      "ataques": {
+        "n": 18,
+        "de": 20,
+        "proporcao": 0.9,
+        "wilson": [
+          0.699,
+          0.9721
+        ]
+      },
+      "concordancia": null,
+      "familias": {
+        "vazamento": 9,
+        "sobrescrita": 5,
+        "ofuscacao": 4
+      },
+      "negativos_dificeis": 2,
+      "idiomas": {
+        "en": 20
+      }
+    },
+    "Lakera/mosscap_prompt_injection": {
+      "fonte": "Lakera/mosscap_prompt_injection",
+      "rotulo_fonte": null,
+      "classe_fonte": null,
+      "textos": 20,
+      "incertos": 1,
+      "ataques": {
+        "n": 13,
+        "de": 19,
+        "proporcao": 0.6842,
+        "wilson": [
+          0.4601,
+          0.8464
+        ]
+      },
+      "concordancia": null,
+      "familias": {
+        "ofuscacao": 9,
+        "vazamento": 4
+      },
+      "negativos_dificeis": 3,
+      "idiomas": {
+        "en": 20
+      }
+    },
+    "OpenAssistant/oasst2": {
+      "fonte": "OpenAssistant/oasst2",
+      "rotulo_fonte": null,
+      "classe_fonte": null,
+      "textos": 20,
+      "incertos": 0,
+      "ataques": {
+        "n": 0,
+        "de": 20,
+        "proporcao": 0.0,
+        "wilson": [
+          0.0,
+          0.1611
+        ]
+      },
+      "concordancia": null,
+      "familias": {},
+      "negativos_dificeis": 3,
+      "idiomas": {
+        "en": 12,
+        "outro": 8
+      }
+    },
+    "TrustAIRLab/in-the-wild-jailbreak-prompts:False": {
+      "fonte": "TrustAIRLab/in-the-wild-jailbreak-prompts",
+      "rotulo_fonte": "False",
+      "classe_fonte": "sem_ataque",
+      "textos": 20,
+      "incertos": 0,
+      "ataques": {
+        "n": 5,
+        "de": 20,
+        "proporcao": 0.25,
+        "wilson": [
+          0.1119,
+          0.4687
+        ]
+      },
+      "concordancia": {
+        "n": 15,
+        "de": 20,
+        "proporcao": 0.75,
+        "wilson": [
+          0.5313,
+          0.8881
+        ],
+        "decisao": "rejeitado"
+      },
+      "familias": {
+        "persona": 5
+      },
+      "negativos_dificeis": 11,
+      "idiomas": {
+        "en": 20
+      }
+    },
+    "TrustAIRLab/in-the-wild-jailbreak-prompts:True": {
+      "fonte": "TrustAIRLab/in-the-wild-jailbreak-prompts",
+      "rotulo_fonte": "True",
+      "classe_fonte": "ataque",
+      "textos": 20,
+      "incertos": 0,
+      "ataques": {
+        "n": 16,
+        "de": 20,
+        "proporcao": 0.8,
+        "wilson": [
+          0.584,
+          0.9193
+        ]
+      },
+      "concordancia": {
+        "n": 16,
+        "de": 20,
+        "proporcao": 0.8,
+        "wilson": [
+          0.584,
+          0.9193
+        ],
+        "decisao": "fase2"
+      },
+      "familias": {
+        "persona": 16
+      },
+      "negativos_dificeis": 3,
+      "idiomas": {
+        "en": 19,
+        "outro": 1
+      }
+    },
+    "ai-safety-brazil/jailbreak-br-synthetic:0": {
+      "fonte": "ai-safety-brazil/jailbreak-br-synthetic",
+      "rotulo_fonte": "0",
+      "classe_fonte": "sem_ataque",
+      "textos": 20,
+      "incertos": 0,
+      "ataques": {
+        "n": 0,
+        "de": 20,
+        "proporcao": 0.0,
+        "wilson": [
+          0.0,
+          0.1611
+        ]
+      },
+      "concordancia": {
+        "n": 20,
+        "de": 20,
+        "proporcao": 1.0,
+        "wilson": [
+          0.8389,
+          1.0
+        ],
+        "decisao": "aceito"
+      },
+      "familias": {},
+      "negativos_dificeis": 16,
+      "idiomas": {
+        "pt": 20
+      }
+    },
+    "ai-safety-brazil/jailbreak-br-synthetic:1": {
+      "fonte": "ai-safety-brazil/jailbreak-br-synthetic",
+      "rotulo_fonte": "1",
+      "classe_fonte": "ataque",
+      "textos": 20,
+      "incertos": 0,
+      "ataques": {
+        "n": 14,
+        "de": 20,
+        "proporcao": 0.7,
+        "wilson": [
+          0.481,
+          0.8545
+        ]
+      },
+      "concordancia": {
+        "n": 14,
+        "de": 20,
+        "proporcao": 0.7,
+        "wilson": [
+          0.481,
+          0.8545
+        ],
+        "decisao": "rejeitado"
+      },
+      "familias": {
+        "sobrescrita": 12,
+        "ofuscacao": 1,
+        "persona": 1
+      },
+      "negativos_dificeis": 6,
+      "idiomas": {
+        "pt": 20
+      }
+    },
+    "ai-safety-brazil/prompt-injection-br-synthetic:0": {
+      "fonte": "ai-safety-brazil/prompt-injection-br-synthetic",
+      "rotulo_fonte": "0",
+      "classe_fonte": "sem_ataque",
+      "textos": 20,
+      "incertos": 0,
+      "ataques": {
+        "n": 0,
+        "de": 20,
+        "proporcao": 0.0,
+        "wilson": [
+          0.0,
+          0.1611
+        ]
+      },
+      "concordancia": {
+        "n": 20,
+        "de": 20,
+        "proporcao": 1.0,
+        "wilson": [
+          0.8389,
+          1.0
+        ],
+        "decisao": "aceito"
+      },
+      "familias": {},
+      "negativos_dificeis": 11,
+      "idiomas": {
+        "pt": 20
+      }
+    },
+    "ai-safety-brazil/prompt-injection-br-synthetic:1": {
+      "fonte": "ai-safety-brazil/prompt-injection-br-synthetic",
+      "rotulo_fonte": "1",
+      "classe_fonte": "ataque",
+      "textos": 20,
+      "incertos": 0,
+      "ataques": {
+        "n": 12,
+        "de": 20,
+        "proporcao": 0.6,
+        "wilson": [
+          0.3866,
+          0.7812
+        ]
+      },
+      "concordancia": {
+        "n": 12,
+        "de": 20,
+        "proporcao": 0.6,
+        "wilson": [
+          0.3866,
+          0.7812
+        ],
+        "decisao": "rejeitado"
+      },
+      "familias": {
+        "sobrescrita": 12
+      },
+      "negativos_dificeis": 5,
+      "idiomas": {
+        "pt": 20
+      }
+    },
+    "allenai/WildChat-1M": {
+      "fonte": "allenai/WildChat-1M",
+      "rotulo_fonte": null,
+      "classe_fonte": null,
+      "textos": 20,
+      "incertos": 0,
+      "ataques": {
+        "n": 0,
+        "de": 20,
+        "proporcao": 0.0,
+        "wilson": [
+          0.0,
+          0.1611
+        ]
+      },
+      "concordancia": null,
+      "familias": {},
+      "negativos_dificeis": 1,
+      "idiomas": {
+        "outro": 11,
+        "en": 8,
+        "pt": 1
+      }
+    },
+    "deepset/prompt-injections:0": {
+      "fonte": "deepset/prompt-injections",
+      "rotulo_fonte": "0",
+      "classe_fonte": "sem_ataque",
+      "textos": 20,
+      "incertos": 0,
+      "ataques": {
+        "n": 0,
+        "de": 20,
+        "proporcao": 0.0,
+        "wilson": [
+          0.0,
+          0.1611
+        ]
+      },
+      "concordancia": {
+        "n": 20,
+        "de": 20,
+        "proporcao": 1.0,
+        "wilson": [
+          0.8389,
+          1.0
+        ],
+        "decisao": "aceito"
+      },
+      "familias": {},
+      "negativos_dificeis": 0,
+      "idiomas": {
+        "outro": 13,
+        "en": 7
+      }
+    },
+    "deepset/prompt-injections:1": {
+      "fonte": "deepset/prompt-injections",
+      "rotulo_fonte": "1",
+      "classe_fonte": "ataque",
+      "textos": 20,
+      "incertos": 0,
+      "ataques": {
+        "n": 12,
+        "de": 20,
+        "proporcao": 0.6,
+        "wilson": [
+          0.3866,
+          0.7812
+        ]
+      },
+      "concordancia": {
+        "n": 12,
+        "de": 20,
+        "proporcao": 0.6,
+        "wilson": [
+          0.3866,
+          0.7812
+        ],
+        "decisao": "rejeitado"
+      },
+      "familias": {
+        "sobrescrita": 9,
+        "persona": 2,
+        "vazamento": 1
+      },
+      "negativos_dificeis": 5,
+      "idiomas": {
+        "en": 14,
+        "outro": 6
+      }
+    },
+    "leolee99/NotInject": {
+      "fonte": "leolee99/NotInject",
+      "rotulo_fonte": null,
+      "classe_fonte": null,
+      "textos": 20,
+      "incertos": 0,
+      "ataques": {
+        "n": 0,
+        "de": 20,
+        "proporcao": 0.0,
+        "wilson": [
+          0.0,
+          0.1611
+        ]
+      },
+      "concordancia": null,
+      "familias": {},
+      "negativos_dificeis": 9,
+      "idiomas": {
+        "en": 14,
+        "outro": 6
+      }
+    },
+    "microsoft/llmail-inject-challenge:False": {
+      "fonte": "microsoft/llmail-inject-challenge",
+      "rotulo_fonte": "False",
+      "classe_fonte": "sem_ataque",
+      "textos": 20,
+      "incertos": 0,
+      "ataques": {
+        "n": 8,
+        "de": 20,
+        "proporcao": 0.4,
+        "wilson": [
+          0.2188,
+          0.6134
+        ]
+      },
+      "concordancia": {
+        "n": 12,
+        "de": 20,
+        "proporcao": 0.6,
+        "wilson": [
+          0.3866,
+          0.7812
+        ],
+        "decisao": "rejeitado"
+      },
+      "familias": {
+        "indireta": 8
+      },
+      "negativos_dificeis": 3,
+      "idiomas": {
+        "en": 20
+      }
+    },
+    "microsoft/llmail-inject-challenge:True": {
+      "fonte": "microsoft/llmail-inject-challenge",
+      "rotulo_fonte": "True",
+      "classe_fonte": "ataque",
+      "textos": 20,
+      "incertos": 0,
+      "ataques": {
+        "n": 20,
+        "de": 20,
+        "proporcao": 1.0,
+        "wilson": [
+          0.8389,
+          1.0
+        ]
+      },
+      "concordancia": {
+        "n": 20,
+        "de": 20,
+        "proporcao": 1.0,
+        "wilson": [
+          0.8389,
+          1.0
+        ],
+        "decisao": "aceito"
+      },
+      "familias": {
+        "indireta": 20
+      },
+      "negativos_dificeis": 0,
+      "idiomas": {
+        "en": 20
+      }
+    },
+    "microsoft/llmail-inject-challenge:Unclear": {
+      "fonte": "microsoft/llmail-inject-challenge",
+      "rotulo_fonte": "Unclear",
+      "classe_fonte": null,
+      "textos": 20,
+      "incertos": 0,
+      "ataques": {
+        "n": 19,
+        "de": 20,
+        "proporcao": 0.95,
+        "wilson": [
+          0.7639,
+          0.9911
+        ]
+      },
+      "concordancia": null,
+      "familias": {
+        "indireta": 19
+      },
+      "negativos_dificeis": 1,
+      "idiomas": {
+        "en": 20
+      }
+    },
+    "microsoft/llmail-inject-challenge:benigno": {
+      "fonte": "microsoft/llmail-inject-challenge",
+      "rotulo_fonte": "benigno",
+      "classe_fonte": "sem_ataque",
+      "textos": 20,
+      "incertos": 0,
+      "ataques": {
+        "n": 0,
+        "de": 20,
+        "proporcao": 0.0,
+        "wilson": [
+          0.0,
+          0.1611
+        ]
+      },
+      "concordancia": {
+        "n": 20,
+        "de": 20,
+        "proporcao": 1.0,
+        "wilson": [
+          0.8389,
+          1.0
+        ],
+        "decisao": "aceito"
+      },
+      "familias": {},
+      "negativos_dificeis": 0,
+      "idiomas": {
+        "en": 20
+      }
+    }
+  }
+}

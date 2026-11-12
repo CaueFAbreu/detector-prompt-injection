@@ -1,8 +1,20 @@
+import json
+
 import pandas as pd
 import pytest
 from openpyxl import Workbook
 
-from src.auditoria_rotulos import decidir, ler_anotacao, problemas_da_linha, wilson
+import src.auditoria_rotulos as auditoria_rotulos
+from src.auditoria_rotulos import (
+    classe_da_fonte,
+    decidir,
+    ler_anotacao,
+    problemas_da_linha,
+    proporcao,
+    resumir,
+    resumir_estrato,
+    wilson,
+)
 
 
 @pytest.mark.parametrize(
@@ -170,3 +182,154 @@ def test_problemas_da_linha_aponta_violacoes_do_guia(
     problemas = problemas_da_linha(classe, familia, negativo_dificil, idioma)
     assert len(problemas) == 1
     assert trecho in problemas[0]
+
+
+@pytest.mark.parametrize(
+    ("rotulo", "esperado"),
+    [
+        ("1", "ataque"),
+        ("True", "ataque"),
+        ("0", "sem_ataque"),
+        ("False", "sem_ataque"),
+        ("benigno", "sem_ataque"),
+        ("Unclear", None),
+        (None, None),
+        (float("nan"), None),
+    ],
+)
+def test_classe_da_fonte_segue_o_mapa_aprovado(rotulo, esperado):
+    assert classe_da_fonte(rotulo) == esperado
+
+
+@pytest.mark.parametrize("rotulo", ["2", "true", "jailbreak", ""])
+def test_classe_da_fonte_recusa_rotulo_desconhecido(rotulo):
+    with pytest.raises(ValueError, match="desconhecido"):
+        classe_da_fonte(rotulo)
+
+
+def test_proporcao_arredonda_e_inclui_wilson():
+    assert proporcao(19, 20) == {
+        "n": 19,
+        "de": 20,
+        "proporcao": 0.95,
+        "wilson": [0.7639, 0.9911],
+    }
+
+
+def test_proporcao_sem_textos_avaliados_nao_tem_intervalo():
+    assert proporcao(0, 0) == {"n": 0, "de": 0, "proporcao": None, "wilson": None}
+
+
+def _linha(classe, familia="", negativo_dificil="", idioma="en", rotulo="1", fonte="f"):
+    estrato = fonte if rotulo is None else f"{fonte}:{rotulo}"
+    return {
+        "fonte": fonte,
+        "rotulo_fonte": rotulo,
+        "estrato": estrato,
+        "classe": classe,
+        "familia": familia,
+        "negativo_dificil": negativo_dificil,
+        "idioma": idioma,
+    }
+
+
+def _estrato_de_ataques(rotulo="1"):
+    return pd.DataFrame(
+        [_linha("ataque", "persona", rotulo=rotulo)] * 16
+        + [_linha("ataque", "vazamento", idioma="pt", rotulo=rotulo)] * 2
+        + [_linha("sem_ataque", negativo_dificil="sim", rotulo=rotulo)]
+        + [_linha("incerto", idioma="outro", rotulo=rotulo)]
+    )
+
+
+def test_resumir_estrato_exclui_incerto_da_concordancia():
+    resumo = resumir_estrato(_estrato_de_ataques())
+
+    assert resumo["textos"] == 20
+    assert resumo["incertos"] == 1
+    assert resumo["classe_fonte"] == "ataque"
+    assert resumo["concordancia"]["n"] == 18
+    assert resumo["concordancia"]["de"] == 19
+    assert resumo["concordancia"]["decisao"] == "fase2"
+    assert resumo["ataques"]["n"] == 18
+    assert resumo["ataques"]["de"] == 19
+
+
+def test_resumir_estrato_conta_familias_dificeis_e_idiomas():
+    resumo = resumir_estrato(_estrato_de_ataques())
+
+    assert resumo["familias"] == {"persona": 16, "vazamento": 2}
+    assert resumo["negativos_dificeis"] == 1
+    assert resumo["idiomas"] == {"en": 17, "pt": 2, "outro": 1}
+
+
+def test_resumir_estrato_mede_concordancia_de_rotulo_negativo():
+    linhas = pd.DataFrame(
+        [_linha("sem_ataque", negativo_dificil="nao", rotulo="0")] * 19
+        + [_linha("ataque", "sobrescrita", rotulo="0")]
+    )
+    resumo = resumir_estrato(linhas)
+
+    assert resumo["classe_fonte"] == "sem_ataque"
+    assert resumo["concordancia"]["n"] == 19
+    assert resumo["concordancia"]["decisao"] == "aceito"
+    assert resumo["ataques"]["n"] == 1
+
+
+@pytest.mark.parametrize("rotulo", ["Unclear", None])
+def test_resumir_estrato_sem_classe_da_fonte_nao_tem_concordancia(rotulo):
+    resumo = resumir_estrato(_estrato_de_ataques(rotulo))
+
+    assert resumo["rotulo_fonte"] == rotulo
+    assert resumo["classe_fonte"] is None
+    assert resumo["concordancia"] is None
+    assert resumo["ataques"]["n"] == 18
+
+
+def test_resumir_estrato_so_com_incertos_nao_tem_proporcao():
+    linhas = pd.DataFrame([_linha("incerto")] * 3)
+    resumo = resumir_estrato(linhas)
+
+    assert resumo["ataques"]["proporcao"] is None
+    assert resumo["concordancia"]["proporcao"] is None
+    assert resumo["concordancia"]["decisao"] == "fase2"
+
+
+def test_resumir_estrato_recusa_estrato_misturado():
+    linhas = pd.DataFrame(
+        [_linha("ataque", "persona"), _linha("sem_ataque", "", "nao", rotulo="0")]
+    )
+    with pytest.raises(ValueError, match="único rótulo"):
+        resumir_estrato(linhas)
+
+
+def test_resumir_separa_estratos_e_gera_json_sem_texto():
+    tabela = pd.concat([_estrato_de_ataques("1"), _estrato_de_ataques(None)], ignore_index=True)
+    tabela["texto"] = "MARCADOR_DE_TEXTO"
+    estratos = resumir(tabela)
+
+    assert list(estratos) == ["f", "f:1"]
+    assert "MARCADOR_DE_TEXTO" not in json.dumps(estratos)
+
+
+def test_main_grava_relatorio_com_hashes(tmp_path, monkeypatch, capsys):
+    caminho_planilha, caminho_chave = _gravar(tmp_path, ANOTACAO_VALIDA, CHAVE_VALIDA)
+    saida = tmp_path / "reports" / "auditoria_rotulos.json"
+    monkeypatch.setattr(auditoria_rotulos, "PLANILHA", caminho_planilha)
+    monkeypatch.setattr(auditoria_rotulos, "CHAVE", caminho_chave)
+    monkeypatch.setattr(auditoria_rotulos, "SAIDA", saida)
+
+    auditoria_rotulos.main()
+
+    bytes_gravados = saida.read_bytes()
+    assert b"\r\n" not in bytes_gravados
+    relatorio = json.loads(bytes_gravados.decode("utf-8"))
+    assert relatorio["entradas"]["planilha"]["arquivo"] == "planilha.xlsx"
+    assert len(relatorio["entradas"]["chave"]["sha256"]) == 64
+    assert set(relatorio["estratos"]) == {
+        "OpenAssistant/oasst2",
+        "deepset/prompt-injections:0",
+        "deepset/prompt-injections:1",
+    }
+    assert "ignore tudo" not in bytes_gravados.decode("utf-8")
+    assert "Relatório em" in capsys.readouterr().out
